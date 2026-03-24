@@ -414,6 +414,186 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   margin: 0;
 }
 
+/* ══════════════════════════════════════════════════
+   MOBILE RESPONSIVE — breakpoints: 768px, 480px
+══════════════════════════════════════════════════ */
+
+/* ── Hamburger button (mobile only) ── */
+.mob-menu-btn {
+  display:none;
+  position:fixed;top:12px;left:12px;z-index:700;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:8px;padding:8px 10px;cursor:pointer;
+  flex-direction:column;gap:4px;
+}
+.mob-menu-btn span { display:block;width:18px;height:2px;background:var(--text);border-radius:2px;transition:all .2s; }
+.mob-overlay {
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:598;
+}
+
+@media (max-width: 768px) {
+  /* ── Show hamburger, hide sidebar by default ── */
+  .mob-menu-btn { display:flex; }
+  .mob-overlay.open { display:block; }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    z-index:599;
+    width:260px;
+  }
+  .sidebar.mob-open { transform: translateX(0); }
+
+  /* ── Main content fills full width ── */
+  .main { margin-left:0 !important; padding:60px 14px 60px !important; }
+
+  /* ── KPI hero row: 1 col on mobile ── */
+  .kpi-row { grid-template-columns:1fr !important; gap:10px !important; }
+
+  /* ── Progress banner: scroll horizontally ── */
+  #progress-banner {
+    display:flex !important;
+    overflow-x:auto;
+    gap:8px !important;
+    padding-bottom:6px;
+    scrollbar-width:none;
+  }
+  #progress-banner > * { flex-shrink:0; min-width:80px; }
+
+  /* ── All 2-col grids → 1 col ── */
+  .lease-grid,
+  .hoto-grid,
+  [style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns:1fr !important;
+  }
+
+  /* ── 3-col hero tiles → 1 col ── */
+  [style*="grid-template-columns:1fr 1fr 1fr"] {
+    grid-template-columns:1fr !important;
+  }
+
+  /* ── Risk grid: 1 col ── */
+  .risk-grid { grid-template-columns:1fr !important; }
+
+  /* ── KPI tiles with repeat(N,1fr) → 2 col or 1 col ── */
+  [style*="grid-template-columns:repeat(5,1fr)"],
+  [style*="grid-template-columns:repeat(4,1fr)"] {
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+  [style*="grid-template-columns:repeat(7,1fr)"] {
+    grid-template-columns:repeat(4,1fr) !important;
+  }
+  [style*="grid-template-columns:repeat(6,1fr)"] {
+    grid-template-columns:repeat(3,1fr) !important;
+  }
+  [style*="grid-template-columns:repeat(3,1fr)"] {
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+
+  /* ── Hiring ramp chart + PES: stack ── */
+  [style*="grid-template-columns:1fr 320px"] {
+    grid-template-columns:1fr !important;
+  }
+
+  /* ── Invoice tracker table: hide less important cols ── */
+  #invoice-tracker-body [style*="grid-template-columns:32px 50px 130px 1fr 120px 100px 130px"] {
+    grid-template-columns:28px 1fr 100px 90px !important;
+  }
+  #invoice-tracker-body [style*="grid-template-columns:32px 50px 130px 1fr 120px 100px 130px"] > :nth-child(2),
+  #invoice-tracker-body [style*="grid-template-columns:32px 50px 130px 1fr 120px 100px 130px"] > :nth-child(3),
+  #invoice-tracker-body [style*="grid-template-columns:32px 50px 130px 1fr 120px 100px 130px"] > :nth-child(7) {
+    display:none;
+  }
+
+  /* ── Floor tile header: compact ── */
+  .floor-tile-hdr { grid-template-columns:50px 1fr 90px 28px !important; }
+  .floor-tile-hdr > :nth-child(3),
+  .floor-tile-hdr > :nth-child(4) { display:none; }
+
+  /* ── Accordion sub-headers: simplify ── */
+  .sub-hdr, .sub-row { font-size:8px !important; }
+  .grid-4 { grid-template-columns:1fr 60px 60px !important; }
+  .grid-5 { grid-template-columns:1fr 60px 60px 60px !important; }
+  .grid-6 { grid-template-columns:1fr 60px 60px 60px !important; }
+
+  /* ── JPMC Workstream KPI tile: 2-col bars ── */
+  #kpi-jpmc-workstreams [style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns:1fr !important;
+  }
+
+  /* ── Workstream tracker sub-activity table ── */
+  #ws-acc [style*="grid-template-columns:1fr 110px 60px 100px"] {
+    grid-template-columns:1fr 80px !important;
+  }
+  #ws-acc [style*="grid-template-columns:1fr 110px 60px 100px"] > :nth-child(3) { display:none; }
+
+  /* ── TC / BB / HC accordion grids → compact ── */
+  [style*="grid-template-columns:110px 1fr 80px 80px 110px"],
+  [style*="grid-template-columns:1fr 120px 60px 70px 110px"] {
+    grid-template-columns:1fr 80px !important;
+  }
+  [style*="grid-template-columns:110px 1fr 80px 80px 110px"] > :nth-child(3),
+  [style*="grid-template-columns:110px 1fr 80px 80px 110px"] > :nth-child(4),
+  [style*="grid-template-columns:1fr 120px 60px 70px 110px"] > :nth-child(3),
+  [style*="grid-template-columns:1fr 120px 60px 70px 110px"] > :nth-child(4) { display:none; }
+
+  /* ── Org chart: scroll horizontally ── */
+  #org-chart-community, #org-chart-ops { overflow-x:auto; }
+
+  /* ── Overdue panel: full screen on mobile ── */
+  #overdue-panel { width:100vw !important; }
+
+  /* ── Chat window ── */
+  .chat-window { width:calc(100vw - 24px) !important; right:12px !important; }
+
+  /* ── Section padding ── */
+  .section { padding:14px 12px !important; }
+  .sec-hdr { font-size:11px !important; }
+  .panel { padding:12px !important; }
+
+  /* ── Filter bars: wrap ── */
+  .sec-filter-bar { flex-wrap:wrap !important; gap:6px !important; }
+  .sec-filter-sel { min-width:0 !important; flex:1 1 auto !important; font-size:8px !important; }
+  .sec-filter-clear { font-size:8px !important; padding:4px 8px !important; }
+
+  /* ── Lease table: horizontal scroll ── */
+  .rev-table { font-size:8px !important; }
+  [style*="overflow-x:auto"] { -webkit-overflow-scrolling:touch; }
+
+  /* ── Hiring category tables ── */
+  .hire-role-row { grid-template-columns:1fr 40px 70px 50px 50px 50px !important; }
+  .hire-role-row > :nth-child(5),
+  .hire-role-row > :nth-child(6) { font-size:10px !important; }
+}
+
+@media (max-width: 480px) {
+  .main { padding:56px 10px 56px !important; }
+
+  /* ── All multi-col KPI strips → 2 col ── */
+  [style*="grid-template-columns:repeat(5,1fr)"],
+  [style*="grid-template-columns:repeat(4,1fr)"],
+  [style*="grid-template-columns:repeat(3,1fr)"] {
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+  [style*="grid-template-columns:repeat(7,1fr)"],
+  [style*="grid-template-columns:repeat(6,1fr)"] {
+    grid-template-columns:repeat(3,1fr) !important;
+  }
+
+  /* ── Progress banner: 3 per row ── */
+  #progress-banner { grid-template-columns:repeat(3,1fr) !important; }
+
+  /* ── Section header font ── */
+  .sec-hdr { font-size:10px !important; }
+
+  /* ── Acc items ── */
+  .acc-hdr { padding:10px 12px !important; }
+  .acc-name { font-size:10px !important; }
+  .acc-meta { font-size:8px !important; }
+  .kpi { padding:12px !important; }
+  .kv  { font-size:28px !important; }
+}
+
 @media print {
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 
@@ -495,6 +675,11 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
 </style>
 </head>
 <body>
+<!-- Mobile hamburger -->
+<button class="mob-menu-btn" onclick="toggleMobSidebar()" aria-label="Menu">
+  <span></span><span></span><span></span>
+</button>
+<div class="mob-overlay" id="mob-overlay" onclick="toggleMobSidebar()"></div>
 
 <!-- ══ SIDEBAR — outside all wrappers, pure fixed positioning ══ -->
 <nav class="sidebar">
@@ -3643,6 +3828,39 @@ function filterOverdueOnly(section){
   const firstBadge = sectionEl.querySelector(".overdue-hdr-badge") || sectionEl.querySelector('[style*="overdue"]');
   if(firstBadge) firstBadge.scrollIntoView({behavior:"smooth", block:"center"});
 }
+
+function toggleMobSidebar(){
+  const sb  = document.querySelector('.sidebar');
+  const ov  = document.getElementById('mob-overlay');
+  const btn = document.querySelector('.mob-menu-btn');
+  if(!sb) return;
+  const open = sb.classList.toggle('mob-open');
+  if(ov)  ov.classList.toggle('open', open);
+  // Animate hamburger → X
+  const spans = btn?.querySelectorAll('span');
+  if(spans){
+    if(open){
+      spans[0].style.cssText='transform:translateY(6px) rotate(45deg)';
+      spans[1].style.opacity='0';
+      spans[2].style.cssText='transform:translateY(-6px) rotate(-45deg)';
+    } else {
+      spans.forEach(s=>s.style.cssText='');
+    }
+  }
+}
+
+// Close sidebar on nav link click (mobile)
+document.querySelectorAll('.sb-link').forEach(l=>{
+  l.addEventListener('click',()=>{
+    if(window.innerWidth<=768){
+      const sb=document.querySelector('.sidebar');
+      const ov=document.getElementById('mob-overlay');
+      sb?.classList.remove('mob-open');
+      ov?.classList.remove('open');
+      document.querySelectorAll('.mob-menu-btn span').forEach(s=>s.style.cssText='');
+    }
+  });
+});
 
 function setupScrollSpy(){
   const sections=["lease","kpis","hoto-tc","hoto-project","hoto-checklist","hoto-bb","other-activities","hiring","hoto-snag","ws-tracker","risks","questions","critical-tasks","upload-section"];
