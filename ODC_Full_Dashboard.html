@@ -4093,18 +4093,21 @@ function parseWorkbook(wb, filename){
   if(bbSheetName){
     try{
       const rows=XLSX.utils.sheet_to_json(wb.Sheets[bbSheetName],{header:1,defval:""});
-      // New cols: 0=Sr No, 1=Phase, 2=Category, 3=Sub-System, 4=Item, 5=Evidence, 6=Critical, 7=Status, 8=Owner, 9=Planned, 10=Actual, 11=Remarks, 12=Priority
+      // Actual cols: 0=SrNo 1=Phase 2=Category 3=Sub-System 4=ChecklistItem 5=Evidence 6=Status 7=Owner 8=Planned 9=Actual 10=Remarks 11=Priority
       const newBB={};
       for(let i=1;i<rows.length;i++){
         const r=rows[i];
-        const cat=safeStr(r[2]);
-        const item=safeStr(r[4]), evidence=safeStr(r[5]), critical=safeStr(r[6]);
-        const status=safeStr(r[7]), priority=safeStr(r[12]);
-        if(!item||item==="nan") continue;
+        const cat     =safeStr(r[2]);
+        const item    =safeStr(r[4]);
+        const evidence=safeStr(r[5]);
+        const status  =safeStr(r[6]);
+        const owner   =safeStr(r[7]);
+        const priority=safeStr(r[11]);
+        if(!item||item==="nan"||item==="Checklist Item") continue;
         const key=cat!=="nan"?cat:"Other";
         if(!newBB[key]) newBB[key]=[];
         const plannedBB=r[8] instanceof Date?r[8].toISOString().slice(0,10):safeStr(r[8])!=="nan"?safeStr(r[8]):"";
-        newBB[key].push({item,evidence:evidence!=="nan"?evidence:"—",critical:critical!=="nan"?critical:"N",status:status!=="nan"?status:"Open",priority:priority!=="nan"?priority:"Medium",planned:plannedBB});
+        newBB[key].push({item,evidence:evidence!=="nan"?evidence:"—",critical:"N",status:status!=="nan"?status:"Open",priority:priority!=="nan"?priority:"Medium",planned:plannedBB});
       }
       if(Object.keys(newBB).length>0){
         // Update BB_DATA and re-render
@@ -5280,53 +5283,71 @@ function renderHOTOChecklistTile(){
   const el=document.getElementById("hoto-checklist-visual");
   if(!el) return;
 
-  // Category data with item counts from the actual checklist
-  const cats=[
-    {name:"General Handover",     n:7,  color:"var(--teal)"},
-    {name:"Electrical System",    n:6,  color:"var(--amber)"},
-    {name:"Fire & Life Safety",   n:4,  color:"var(--red)"},
-    {name:"HVAC System",          n:5,  color:"var(--teal)"},
-    {name:"ELV Systems",          n:4,  color:"var(--amber)"},
-    {name:"Base Building",        n:9,  color:"var(--teal)"},
-    {name:"Statutory Approvals",  n:7,  color:"var(--red)"},
-    {name:"Documentation",        n:5,  color:"var(--amber)"},
-    {name:"Safety",               n:2,  color:"var(--red)"},
-    {name:"Pub. Health Eng.",     n:2,  color:"var(--teal)"},
-    {name:"Equipment",            n:2,  color:"var(--muted2)"},
-    {name:"Logistics",            n:6,  color:"var(--muted2)"},
-  ];
-  const total=cats.reduce((s,c)=>s+c.n,0);
-
-  // Read live signed-off count from the actual hoto accordion
+  // Read live counts from rendered pills if available, else fall back to _HC_FROM_EXCEL
   const hotoEl=document.getElementById("hoto-checklist-acc");
-  const closedPills=hotoEl?hotoEl.querySelectorAll(".pill.closed").length:0;
-  const allPills=hotoEl?hotoEl.querySelectorAll(".pill").length:total;
-  const pctDone=allPills>0?Math.round(closedPills/allPills*100):0;
-  const pending=allPills-closedPills;
+  const allPills   = hotoEl ? hotoEl.querySelectorAll(".pill").length : 0;
+  const closedPills= hotoEl ? hotoEl.querySelectorAll(".pill.closed").length : 0;
+  const inprogPills= hotoEl ? hotoEl.querySelectorAll(".pill.inprog").length : 0;
+  const openPills  = allPills - closedPills - inprogPills;
+
+  // Fall back to _HC_FROM_EXCEL when section hasn't rendered yet
+  let total=allPills, done=closedPills, wip=inprogPills, open=openPills;
+  if(total===0 && window._HC_FROM_EXCEL){
+    const all=Object.values(window._HC_FROM_EXCEL).flatMap(a=>a);
+    total=all.length;
+    done =all.filter(i=>(i.status||"").toLowerCase()==="closed").length;
+    wip  =all.filter(i=>(i.status||"").toLowerCase()==="in progress").length;
+    open =total-done-wip;
+  }
+  const pct=total>0?Math.round(done/total*100):0;
+  const barCol=pct>=60?"var(--teal)":pct>0?"var(--amber)":"var(--border)";
+
+  // Category breakdown from _HC_FROM_EXCEL
+  const cats=window._HC_FROM_EXCEL
+    ? Object.entries(window._HC_FROM_EXCEL).map(([name,items])=>({
+        name,
+        n:items.length,
+        done:items.filter(i=>(i.status||"").toLowerCase()==="closed").length,
+        wip:items.filter(i=>(i.status||"").toLowerCase()==="in progress").length,
+      }))
+    : [
+        {name:"General Handover",n:7,done:0,wip:0},
+        {name:"Electrical",n:6,done:0,wip:0},
+        {name:"Fire & Life Safety",n:4,done:0,wip:0},
+        {name:"HVAC",n:5,done:0,wip:0},
+        {name:"ELV Systems",n:4,done:0,wip:0},
+        {name:"Base Building",n:9,done:0,wip:0},
+        {name:"Statutory",n:7,done:0,wip:0},
+        {name:"Documentation",n:5,done:0,wip:0},
+      ];
 
   el.innerHTML=`
-    <!-- Overall progress -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-      <span style="font-size:9px;color:var(--muted);">${closedPills} of ${allPills} items signed off</span>
-      <span style="font-size:11px;font-weight:700;font-family:var(--font-d);color:${pctDone>50?"var(--teal)":"var(--amber)"};">${pctDone}%</span>
+      <span style="font-size:9px;color:var(--muted);">${done} of ${total} items signed off</span>
+      <span style="font-size:11px;font-weight:700;font-family:var(--font-d);color:${barCol};">${pct}%</span>
     </div>
-    <div style="height:7px;background:var(--s2);border-radius:4px;overflow:hidden;margin-bottom:12px;">
-      <div style="height:100%;width:${pctDone}%;background:${pctDone>50?"var(--teal)":"var(--amber)"};border-radius:4px;transition:width .6s;"></div>
+    <div style="height:6px;background:var(--s2);border-radius:3px;overflow:hidden;margin-bottom:8px;">
+      <div style="height:100%;width:${pct}%;background:${barCol};border-radius:3px;transition:width .6s;"></div>
     </div>
-    <!-- Category breakdown grid -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;">
-      ${cats.map(c=>`
-        <div class="chk-row">
-          <div class="chk-lbl">${c.name}</div>
-          <div class="chk-track">
-            <div class="chk-fill" style="background:${c.color};width:100%;opacity:.7;"></div>
+    <div style="display:flex;gap:12px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">
+      <span style="font-size:9px;color:var(--teal);">✓ ${done} done</span>
+      <span style="font-size:9px;color:var(--amber);">● ${wip} in prog</span>
+      <span style="font-size:9px;color:var(--muted2);">○ ${open} open</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;overflow-y:auto;max-height:200px;">
+      ${cats.map(c=>{
+        const cp=c.n>0?Math.round(c.done/c.n*100):0;
+        const cc=cp===100?"var(--teal)":cp>0?"var(--amber)":"var(--muted2)";
+        return `<div style="display:grid;grid-template-columns:1fr 24px;gap:4px;align-items:center;margin-bottom:3px;">
+          <div>
+            <div style="font-size:7px;color:var(--muted);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.name}</div>
+            <div style="height:3px;background:var(--s3);border-radius:2px;overflow:hidden;">
+              <div style="height:100%;width:${cp}%;background:${cc};border-radius:2px;"></div>
+            </div>
           </div>
-          <div class="chk-num" style="color:${c.color}">${c.n}</div>
-        </div>`).join("")}
-    </div>
-    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);">
-      <span style="font-size:9px;color:var(--muted);">${total} total items</span>
-      <span style="font-size:9px;color:${pending>0?"var(--amber)":"var(--teal)"};">${pending} pending</span>
+          <div style="font-size:8px;font-weight:700;color:${cc};text-align:right;">${c.done}/${c.n}</div>
+        </div>`;
+      }).join("")}
     </div>`;
 }
 
@@ -5524,37 +5545,51 @@ function renderBBTile(){
   const el=document.getElementById("kpi-bb-visual");
   if(!el) return;
 
-  const bbEl=document.getElementById("bb-acc");
-  const totalPills  = bbEl ? bbEl.querySelectorAll(".pill").length       : 0;
-  const closedPills = bbEl ? bbEl.querySelectorAll(".pill.closed").length : 0;
-  const inprogPills = bbEl ? bbEl.querySelectorAll(".pill.inprog").length : 0;
-  const openPills   = totalPills - closedPills - inprogPills;
-  const pct = totalPills>0 ? Math.round(closedPills/totalPills*100) : 0;
+  // Read directly from BB_DATA — not from DOM pills which only exist if section is open
+  const allItems=Object.values(BB_DATA).flatMap(a=>a);
+  const total   =allItems.length;
+  const done    =allItems.filter(i=>(i.status||"Open").toLowerCase()==="closed").length;
+  const wip     =allItems.filter(i=>(i.status||"Open").toLowerCase()==="in progress").length;
+  const open    =total-done-wip;
+  const pct     =total>0?Math.round(done/total*100):0;
+  const barCol  =pct>=60?"var(--teal)":pct>0?"var(--amber)":"var(--border)";
 
-  const cats = Object.entries(BB_DATA).map(([name,items])=>({name, n:items.length,
-    critical: items.filter(i=>i.priority==="Critical"||i.priority==="Go-Live Critical").length}));
-  const barCol = pct>=60?"var(--teal)":pct>0?"var(--amber)":"var(--border)";
+  const cats=Object.entries(BB_DATA).map(([name,items])=>({
+    name,
+    n:     items.length,
+    done:  items.filter(i=>(i.status||"Open").toLowerCase()==="closed").length,
+    wip:   items.filter(i=>(i.status||"Open").toLowerCase()==="in progress").length,
+    critical: items.filter(i=>i.critical==="Y").length,
+  }));
 
   el.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-      <span style="font-size:9px;color:var(--muted);">${closedPills} of ${totalPills} items complete</span>
+      <span style="font-size:9px;color:var(--muted);">${done} of ${total} items complete</span>
       <span style="font-size:11px;font-weight:700;font-family:var(--font-d);color:${barCol};">${pct}%</span>
     </div>
-    <div style="height:6px;background:var(--s2);border-radius:3px;overflow:hidden;margin-bottom:12px;">
+    <div style="height:6px;background:var(--s2);border-radius:3px;overflow:hidden;margin-bottom:8px;">
       <div style="height:100%;width:${pct}%;background:${barCol};border-radius:3px;transition:width .6s;"></div>
     </div>
-    <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);">
-      <span style="font-size:9px;color:var(--teal);">✓ ${closedPills} done</span>
-      <span style="font-size:9px;color:var(--amber);">● ${inprogPills} in prog</span>
-      <span style="font-size:9px;color:var(--muted2);">○ ${openPills} open</span>
+    <div style="display:flex;gap:12px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">
+      <span style="font-size:9px;color:var(--teal);">✓ ${done} done</span>
+      <span style="font-size:9px;color:var(--amber);">● ${wip} in prog</span>
+      <span style="font-size:9px;color:var(--muted2);">○ ${open} open</span>
     </div>
-    <div style="display:flex;flex-direction:column;gap:4px;overflow-y:auto;max-height:260px;">
-      ${cats.map(c=>`
-        <div style="display:grid;grid-template-columns:1fr auto 28px;gap:6px;align-items:center;">
-          <div style="font-size:8px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.name}</div>
-          ${c.critical>0?`<span style="font-size:7px;color:var(--red);background:rgba(255,77,109,.1);padding:1px 5px;border-radius:3px;">⚠ ${c.critical}</span>`:"<span></span>"}
-          <div style="font-size:9px;font-weight:700;color:var(--amber);text-align:right;">${c.n}</div>
-        </div>`).join("")}
+    <div style="display:flex;flex-direction:column;gap:4px;overflow-y:auto;max-height:200px;">
+      ${cats.map(c=>{
+        const cp=c.n>0?Math.round(c.done/c.n*100):0;
+        const cc=cp===100?"var(--teal)":cp>0?"var(--amber)":"var(--muted2)";
+        return `<div style="display:grid;grid-template-columns:1fr auto 36px;gap:6px;align-items:center;">
+          <div>
+            <div style="font-size:7px;color:var(--muted);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.name}</div>
+            <div style="height:3px;background:var(--s3);border-radius:2px;overflow:hidden;">
+              <div style="height:100%;width:${cp}%;background:${cc};border-radius:2px;transition:width .6s;"></div>
+            </div>
+          </div>
+          ${c.critical>0?`<span style="font-size:7px;color:var(--red);background:rgba(255,77,109,.1);padding:1px 4px;border-radius:3px;">⚠${c.critical}</span>`:"<span></span>"}
+          <div style="font-size:8px;font-weight:700;color:${cc};text-align:right;">${c.done}/${c.n}</div>
+        </div>`;
+      }).join("")}
     </div>`;
 }
 
@@ -7071,7 +7106,7 @@ function toggleTheme(){
 </script>
 
 <!-- ── GLOBAL OVERDUE PANEL ──────────────────────────────────────────────── -->
-<div id="overdue-panel" style="display:none;position:fixed;top:0;right:0;width:520px;height:100vh;
+<div id="overdue-panel" style="display:none;position:fixed;top:0;right:0;width:min(680px,92vw);height:100vh;
   background:var(--s1);border-left:1px solid var(--border);z-index:600;
   display:none;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.5);">
   <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
