@@ -418,6 +418,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
    MOBILE RESPONSIVE — breakpoints: 768px, 480px
 ══════════════════════════════════════════════════ */
 
+/* ── KPI nav tiles need overflow visible for scrollable content ── */
+.kpi-nav-tile { overflow: visible !important; }
 /* ── Hamburger button (mobile only) ── */
 .mob-menu-btn {
   display:none;
@@ -847,7 +849,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
     </div>
 
     <!-- Tile 2: High Risks — clickable → risks section -->
-    <div class="kpi k-red" style="padding:20px;cursor:pointer;display:flex;flex-direction:column;" onclick="navToSection('risks')">
+    <div class="kpi k-red" style="padding:20px;cursor:pointer;display:flex;flex-direction:column;overflow:visible;" onclick="navToSection('risks')">
       <div class="kl">High Priority Risks</div>
       <div class="kv" style="font-size:42px;line-height:1;" id="kv-high-risks">5</div>
       <div style="margin-top:8px;display:flex;flex-direction:column;gap:3px;max-height:120px;overflow-y:auto;padding-right:2px;" id="risk-preview-list"></div>
@@ -4310,23 +4312,35 @@ function parseWorkbook(wb, filename){
     }catch(e){console.warn("Questions parse error:",e);}
   }
 
-  // ── OTHER ACTIVITIES (new structure: SrNo|Category|Subcategory|Activity|Status|Owner...) ──
+  // ── OTHER ACTIVITIES — auto-detects old (Source col) vs new (no Source col) ──
   if(wb.SheetNames.includes("Other Activities")){
     try{
       const rows=XLSX.utils.sheet_to_json(wb.Sheets["Other Activities"],{header:1,defval:""});
-      // New cols: 0=SrNo 1=Category 2=Subcategory 3=Activity 4=Status 5=Owner 6=Planned 7=Actual 8=Remarks 9=Priority
+      if(!rows.length){ throw new Error("empty"); }
+      // Detect format by checking header row col 1
+      // Old: SrNo|Source|Category|Sub|Activity|Status|Owner|Planned|...|Priority
+      // New: SrNo|Category|Sub|Activity|Status|Owner|Planned|...|Priority
+      const hdr=rows[0];
+      const hasSource = safeStr(hdr[1]).toLowerCase().includes("source");
+      const offCat    = hasSource ? 2 : 1;
+      const offSub    = hasSource ? 3 : 2;
+      const offDesc   = hasSource ? 4 : 3;
+      const offStatus = hasSource ? 5 : 4;
+      const offOwner  = hasSource ? 6 : 5;
+      const offPlan   = hasSource ? 7 : 6;
+      const offPrio   = hasSource ? 10 : 9;
       const newOA=[];
       for(let i=1;i<rows.length;i++){
         const r=rows[i];
         const srNo=safeStr(r[0]);
         if(!srNo||srNo==="nan"||srNo==="Sr No") continue;
-        const cat   =safeStr(r[1])!=="nan"?safeStr(r[1]):"";
-        const sub   =safeStr(r[2])!=="nan"?safeStr(r[2]):"";
-        const desc  =safeStr(r[3])!=="nan"?safeStr(r[3]):"";
-        const status=safeStr(r[4])!=="nan"?safeStr(r[4]):"Open";
-        const owner =safeStr(r[5])!=="nan"?safeStr(r[5]):"";
-        const prio  =safeStr(r[9])!=="nan"?safeStr(r[9]):"High";
-        const plannedOA=r[6] instanceof Date?r[6].toISOString().slice(0,10):safeStr(r[6])!=="nan"?safeStr(r[6]):"";
+        const cat   =safeStr(r[offCat])!=="nan"?safeStr(r[offCat]):"";
+        const sub   =safeStr(r[offSub])!=="nan"?safeStr(r[offSub]):"";
+        const desc  =safeStr(r[offDesc])!=="nan"?safeStr(r[offDesc]):"";
+        const status=safeStr(r[offStatus])!=="nan"?safeStr(r[offStatus]):"Open";
+        const owner =safeStr(r[offOwner])!=="nan"?safeStr(r[offOwner]):"";
+        const prio  =safeStr(r[offPrio])!=="nan"?safeStr(r[offPrio]):"High";
+        const plannedOA=r[offPlan] instanceof Date?r[offPlan].toISOString().slice(0,10):safeStr(r[offPlan])!=="nan"?safeStr(r[offPlan]):"";
         if(!cat&&!desc) continue;
         newOA.push({cat,sub,desc,status,owner,priority:prio,planned:plannedOA});
       }
@@ -5326,7 +5340,7 @@ function renderHOTOChecklistTile(){
       <span style="font-size:9px;color:var(--muted);">${done} of ${total} items signed off</span>
       <span style="font-size:11px;font-weight:700;font-family:var(--font-d);color:${barCol};">${pct}%</span>
     </div>
-    <div style="height:6px;background:var(--s2);border-radius:3px;overflow:hidden;margin-bottom:8px;">
+    <div style="height:6px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:8px);">
       <div style="height:100%;width:${pct}%;background:${barCol};border-radius:3px;transition:width .6s;"></div>
     </div>
     <div style="display:flex;gap:12px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">
@@ -5338,14 +5352,15 @@ function renderHOTOChecklistTile(){
       ${cats.map(c=>{
         const cp=c.n>0?Math.round(c.done/c.n*100):0;
         const cc=cp===100?"var(--teal)":cp>0?"var(--amber)":"var(--muted2)";
-        return `<div style="display:grid;grid-template-columns:1fr 24px;gap:4px;align-items:center;margin-bottom:3px;">
+        const ccH=cp>=100?"#00d4b4":cp>0?"#f0a500":"#ff4d6d";
+        return `<div style="display:grid;grid-template-columns:1fr 28px;gap:4px;align-items:center;margin-bottom:3px;">
           <div>
             <div style="font-size:7px;color:var(--muted);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.name}</div>
-            <div style="height:3px;background:var(--s3);border-radius:2px;overflow:hidden;">
-              <div style="height:100%;width:${cp}%;background:${cc};border-radius:2px;"></div>
+            <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;">
+              <div style="height:100%;width:${cp===0?100:cp}%;background:${cp===0?"rgba(255,77,109,0.25)":ccH};border-radius:2px;transition:width .6s;"></div>
             </div>
           </div>
-          <div style="font-size:8px;font-weight:700;color:${cc};text-align:right;">${c.done}/${c.n}</div>
+          <div style="font-size:8px;font-weight:700;color:${ccH};text-align:right;">${c.done}/${c.n}</div>
         </div>`;
       }).join("")}
     </div>`;
@@ -5506,37 +5521,49 @@ function renderTCTile(){
   const el=document.getElementById("kpi-tc-visual");
   if(!el) return;
 
-  const tcEl=document.getElementById("tc-acc");
-  const totalPills  = tcEl ? tcEl.querySelectorAll(".pill").length       : 0;
-  const closedPills = tcEl ? tcEl.querySelectorAll(".pill.closed").length : 0;
-  const inprogPills = tcEl ? tcEl.querySelectorAll(".pill.inprog").length : 0;
-  const openPills   = totalPills - closedPills - inprogPills;
-  const pct = totalPills>0 ? Math.round(closedPills/totalPills*100) : 0;
+  // Read directly from TC_DATA — not from DOM pills
+  const allItems=Object.values(TC_DATA).flatMap(d=>d.items||[]);
+  const total   =allItems.length;
+  const done    =allItems.filter(i=>(i.status||"").toLowerCase()==="closed").length;
+  const wip     =allItems.filter(i=>(i.status||"").toLowerCase()==="in progress").length;
+  const open    =total-done-wip;
+  const pct     =total>0?Math.round(done/total*100):0;
+  const barCol  =pct>=60?"var(--teal)":pct>0?"var(--amber)":"var(--border)";
 
-  const services = Object.entries(TC_DATA).map(([name, data])=>({name, n:data.items.length}));
-  const totalItems = services.reduce((s,x)=>s+x.n, 0);
-  const barCol = pct>=60?"var(--teal)":pct>0?"var(--amber)":"var(--border)";
+  const cats=Object.entries(TC_DATA).map(([name,data])=>({
+    name,
+    n:    (data.items||[]).length,
+    done: (data.items||[]).filter(i=>(i.status||"").toLowerCase()==="closed").length,
+    wip:  (data.items||[]).filter(i=>(i.status||"").toLowerCase()==="in progress").length,
+  }));
 
   el.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-      <span style="font-size:9px;color:var(--muted);">${closedPills} of ${totalPills} items complete</span>
+      <span style="font-size:9px;color:var(--muted);">${done} of ${total} items complete</span>
       <span style="font-size:11px;font-weight:700;font-family:var(--font-d);color:${barCol};">${pct}%</span>
     </div>
-    <div style="height:6px;background:var(--s2);border-radius:3px;overflow:hidden;margin-bottom:12px;">
+    <div style="height:6px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:8px;">
       <div style="height:100%;width:${pct}%;background:${barCol};border-radius:3px;transition:width .6s;"></div>
     </div>
-    <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);">
-      <span style="font-size:9px;color:var(--teal);">✓ ${closedPills} done</span>
-      <span style="font-size:9px;color:var(--amber);">● ${inprogPills} in prog</span>
-      <span style="font-size:9px;color:var(--muted2);">○ ${openPills} open</span>
+    <div style="display:flex;gap:12px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border);">
+      <span style="font-size:9px;color:var(--teal);">✓ ${done} done</span>
+      <span style="font-size:9px;color:var(--amber);">● ${wip} in prog</span>
+      <span style="font-size:9px;color:var(--muted2);">○ ${open} open</span>
     </div>
-    <div style="display:flex;flex-direction:column;gap:5px;">
-      ${services.slice(0,6).map(s=>`
-        <div style="display:grid;grid-template-columns:1fr 28px;gap:6px;align-items:center;">
-          <div style="font-size:8px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.name}</div>
-          <div style="font-size:9px;font-weight:700;color:var(--amber);text-align:right;">${s.n}</div>
-        </div>`).join("")}
-      ${services.length>6?`<div style="font-size:8px;color:var(--muted2);">+${services.length-6} more systems</div>`:""}
+    <div style="display:flex;flex-direction:column;gap:5px;overflow-y:auto;max-height:200px;">
+      ${cats.map(cat=>{
+        const cp=cat.n>0?Math.round(cat.done/cat.n*100):0;
+        const cc=cp===100?"#00d4b4":cat.wip>0?"#f0a500":"#ff4d6d";
+        return `<div style="display:grid;grid-template-columns:1fr 36px;gap:6px;align-items:center;">
+          <div>
+            <div style="font-size:7px;color:var(--muted);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cat.name}</div>
+            <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;">
+              <div style="height:100%;width:${cp===0?100:cp}%;background:${cp===0?"rgba(255,77,109,0.25)":cc};border-radius:2px;transition:width .6s;"></div>
+            </div>
+          </div>
+          <div style="font-size:8px;font-weight:700;color:${cc};text-align:right;">${cat.done}/${cat.n}</div>
+        </div>`;
+      }).join("")}
     </div>`;
 }
 
@@ -5567,7 +5594,7 @@ function renderBBTile(){
       <span style="font-size:9px;color:var(--muted);">${done} of ${total} items complete</span>
       <span style="font-size:11px;font-weight:700;font-family:var(--font-d);color:${barCol};">${pct}%</span>
     </div>
-    <div style="height:6px;background:var(--s2);border-radius:3px;overflow:hidden;margin-bottom:8px;">
+    <div style="height:6px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:8px;">
       <div style="height:100%;width:${pct}%;background:${barCol};border-radius:3px;transition:width .6s;"></div>
     </div>
     <div style="display:flex;gap:12px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">
@@ -5579,15 +5606,16 @@ function renderBBTile(){
       ${cats.map(c=>{
         const cp=c.n>0?Math.round(c.done/c.n*100):0;
         const cc=cp===100?"var(--teal)":cp>0?"var(--amber)":"var(--muted2)";
+        const cc2=cp>=100?"#00d4b4":cp>0?"#f0a500":"#ff4d6d";
         return `<div style="display:grid;grid-template-columns:1fr auto 36px;gap:6px;align-items:center;">
           <div>
             <div style="font-size:7px;color:var(--muted);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.name}</div>
-            <div style="height:3px;background:var(--s3);border-radius:2px;overflow:hidden;">
-              <div style="height:100%;width:${cp}%;background:${cc};border-radius:2px;transition:width .6s;"></div>
+            <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;">
+              <div style="height:100%;width:${cp===0?100:cp}%;background:${cp===0?"rgba(255,77,109,0.25)":cc2};border-radius:2px;transition:width .6s;"></div>
             </div>
           </div>
-          ${c.critical>0?`<span style="font-size:7px;color:var(--red);background:rgba(255,77,109,.1);padding:1px 4px;border-radius:3px;">⚠${c.critical}</span>`:"<span></span>"}
-          <div style="font-size:8px;font-weight:700;color:${cc};text-align:right;">${c.done}/${c.n}</div>
+          ${c.critical>0?`<span style="font-size:7px;color:#ff4d6d;background:rgba(255,77,109,.1);padding:1px 4px;border-radius:3px;">⚠${c.critical}</span>`:"<span></span>"}
+          <div style="font-size:8px;font-weight:700;color:${cc2};text-align:right;">${c.done}/${c.n}</div>
         </div>`;
       }).join("")}
     </div>`;
@@ -6129,17 +6157,17 @@ function renderOAKPITile(){
   const catRows = cats.map(cat=>{
     const items = OA_DATA.filter(a=>a.cat===cat);
     const cDone = items.filter(a=>a.status==="Closed").length;
+    const cWip  = items.filter(a=>a.status==="In Progress").length;
     const cPct  = Math.round(cDone/items.length*100);
-    const col   = cPct===100?"var(--teal)":cDone>0?"var(--amber)":"var(--muted2)";
-    return `<div style="display:grid;grid-template-columns:1fr 28px 28px;gap:4px;align-items:center;margin-bottom:5px;">
+    const col   = cPct===100?"#00d4b4":cWip>0?"#f0a500":"#ff4d6d";
+    return `<div style="display:grid;grid-template-columns:1fr 36px;gap:6px;align-items:center;margin-bottom:5px;">
       <div>
         <div style="font-size:8px;color:var(--muted);margin-bottom:2px;">${cat}</div>
-        <div style="height:4px;background:var(--s2);border-radius:2px;overflow:hidden;">
-          <div style="height:100%;width:${cPct}%;background:${col};border-radius:2px;transition:width .6s;"></div>
+        <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;">
+          <div style="height:100%;width:${cPct===0?100:cPct}%;background:${cPct===0?"rgba(255,77,109,0.25)":col};border-radius:2px;transition:width .6s;"></div>
         </div>
       </div>
-      <div style="font-size:8px;color:var(--teal);text-align:right;">${cDone}</div>
-      <div style="font-size:8px;color:var(--muted);text-align:right;">${items.length}</div>
+      <div style="font-size:8px;font-weight:700;color:${col};text-align:right;">${cDone}/${items.length}</div>
     </div>`;
   }).join("");
 
