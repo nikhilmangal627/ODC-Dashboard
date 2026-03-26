@@ -59,7 +59,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-m);min-height
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(200,120,50,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(200,120,50,.04) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;}
 
 /* ── LAYOUT — sidebar OUTSIDE main wrapper, no competing z-index ── */
-.sidebar{width:220px;background:var(--s2);border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;overflow-y:auto;transition:width .25s ease,transform .25s ease;}
+.sidebar{width:220px;background:var(--s2);border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;overflow-y:auto;transition:width .25s ease,transform .25s ease;display:flex;flex-direction:column;}
 .sidebar.collapsed{width:0;overflow:hidden;border-right:none;}
 .sidebar-toggle-btn{display:flex;align-items:center;justify-content:space-between;padding:10px 18px 8px;cursor:pointer;border-bottom:1px solid var(--border);font-size:10px;color:var(--muted);user-select:none;}
 .sidebar-toggle-btn:hover{color:var(--orange);}
@@ -83,7 +83,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .sb-lcd .lcd-lbl{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
 .sb-lcd .lcd-val{font-family:var(--font-d);font-size:15px;font-weight:800;color:#2e7d5a;}
 .sb-lcd .lcd-days{font-size:9px;color:var(--amber);margin-top:2px;}
-.sb-nav{padding:8px 0 20px;}
+.sb-nav{padding:8px 0 8px;flex:1;}
 .sb-section{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted2);padding:10px 18px 4px;}
 
 /* ── PAGE HEADER ── */
@@ -550,13 +550,28 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   ── */
   .sub-hdr, .sub-row { font-size:9px !important; }
 
-  /* TC: Sub-System | Activity | Owner | Planned | Status → Activity | Status */
+  /* TC: Sub-System | Activity | Owner | Planned | Priority | Status → Activity | Status */
+  [style*="grid-template-columns:110px 1fr 80px 90px 70px 110px"] {
+    grid-template-columns:1fr 90px !important;
+  }
+  [style*="grid-template-columns:110px 1fr 80px 90px 70px 110px"] > :nth-child(1),
+  [style*="grid-template-columns:110px 1fr 80px 90px 70px 110px"] > :nth-child(3),
+  [style*="grid-template-columns:110px 1fr 80px 90px 70px 110px"] > :nth-child(4),
+  [style*="grid-template-columns:110px 1fr 80px 90px 70px 110px"] > :nth-child(5) { display:none !important; }
+  /* Old TC pattern fallback */
   [style*="grid-template-columns:110px 1fr 80px 80px 110px"] {
     grid-template-columns:1fr 90px !important;
   }
   [style*="grid-template-columns:110px 1fr 80px 80px 110px"] > :nth-child(1),
   [style*="grid-template-columns:110px 1fr 80px 80px 110px"] > :nth-child(3),
   [style*="grid-template-columns:110px 1fr 80px 80px 110px"] > :nth-child(4) { display:none !important; }
+  /* CT: Task | Owner | Planned | Priority | Status → Task | Status */
+  [style*="grid-template-columns:1fr 90px 90px 70px 90px"] {
+    grid-template-columns:1fr 90px !important;
+  }
+  [style*="grid-template-columns:1fr 90px 90px 70px 90px"] > :nth-child(2),
+  [style*="grid-template-columns:1fr 90px 90px 70px 90px"] > :nth-child(3),
+  [style*="grid-template-columns:1fr 90px 90px 70px 90px"] > :nth-child(4) { display:none !important; }
 
   /* BB/HC: Item | Owner | Planned | Priority | Status → Item | Status */
   [style*="grid-template-columns:1fr 80px 90px 70px 110px"],
@@ -666,7 +681,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   .kv  { font-size:26px !important; }
 
   /* ── Sub rows: tighter padding ── */
-  .sub-row { padding:8px 10px !important; }
+  .sub-row { padding:7px 10px !important; min-height:0 !important; }
   .sub-hdr { padding:6px 10px !important; }
 
   /* ── Pills: smaller ── */
@@ -2392,17 +2407,18 @@ function renderTC(){
         </div>
       </div>
       <div class="acc-body">
-        <div class="sub-hdr" style="display:grid;grid-template-columns:110px 1fr 80px 80px 110px;gap:8px;padding:10px 18px 6px;">
-          <div>Sub-System</div><div>Test Activity</div><div>Owner</div><div>Planned</div><div>Status</div>
+        <div class="sub-hdr" style="display:grid;grid-template-columns:110px 1fr 80px 90px 70px 110px;gap:8px;">
+          <div>Sub-System</div><div>Test Activity</div><div>Owner</div><div>Planned</div><div>Priority</div><div>Status</div>
         </div>
         ${data.items.map((it,si)=>{
           const sc=it.status==="Closed"?"closed":it.status==="In Progress"?"inprog":"open";
-          return `<div class="sub-row" style="display:grid;grid-template-columns:110px 1fr 80px 80px 110px;gap:8px;padding:7px 18px;align-items:center;">
+          return `<div class="sub-row" style="display:grid;grid-template-columns:110px 1fr 80px 90px 70px 110px;gap:8px;padding:9px 18px;align-items:start;">
             <div class="sub-muted">${it.sub||it.cat||""}</div>
             <div class="sub-scope">${it.item||it.act||""}</div>
             <div style="font-size:9px;color:var(--muted);">${it.owner||"—"}</div>
             <div style="font-size:9px;color:var(--muted);">${it.planned||"—"}</div>
-            <div style="display:flex;align-items:center;gap:4px;"><span class="pill ${sc} tc-pill" id="${id}-sub-${si}" onclick="cyclePill(this)">${pillLabel(it.status||"Open")}</span>${overdueBadge(it.planned,it.status)}</div>
+            <div style="font-size:9px;color:var(--muted);">${it.priority||"—"}</div>
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;"><span class="pill ${sc} tc-pill" id="${id}-sub-${si}" onclick="cyclePill(this)">${pillLabel(it.status||"Open")}</span>${overdueBadge(it.planned,it.status)}</div>
           </div>`;
         }).join("")}
       </div>`;
@@ -6935,6 +6951,64 @@ renderAllKPITiles();
 setTimeout(()=>{ renderProgressBanner(); refreshAllOverdueBadges(); }, 200);
 setupScrollSpy();
 refreshDates(); // auto-refresh dates on every open
+
+// ── OneDrive auto-fetch — loads latest Excel on page open ────────────────────
+(function autoFetchOneDrive(){
+  // Three URL strategies to try in order
+  const shareUrl = "https://cowrkso365-my.sharepoint.com/:x:/g/personal/nihareeka_rode_cowrks_com/IQC_g_073QXrSqP6ouwAgiNfAcs6nWo9uGefP4_yK1QGSl4?e=ko5YwA";
+  const encoded  = btoa(shareUrl).replace(/=/g,'').replace(/\//g,'_').replace(/\+/g,'-');
+  const URLS = [
+    // Strategy 1: OneDrive API direct
+    `https://api.onedrive.com/v1.0/shares/u!${encoded}/root/content`,
+    // Strategy 2: Graph API
+    `https://graph.microsoft.com/v1.0/shares/u!${encoded}/root/content`,
+    // Strategy 3: Download link via web query
+    `https://cowrkso365-my.sharepoint.com/:x:/g/personal/nihareeka_rode_cowrks_com/IQC_g_073QXrSqP6ouwAgiNfAcs6nWo9uGefP4_yK1QGSl4?download=1`,
+  ];
+
+  // Show loading indicator
+  const indicator = document.createElement('div');
+  indicator.id = 'od-sync-indicator';
+  indicator.style.cssText = 'margin:0 14px 14px;margin-top:auto;padding:5px 10px;border-radius:6px;font-size:9px;background:rgba(232,99,42,.08);color:var(--muted);border:1px solid rgba(232,99,42,.2);display:flex;align-items:center;gap:6px;';
+  indicator.innerHTML = '<span style="animation:pulse 1.4s infinite;display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;"></span>Syncing from OneDrive…';
+  // Insert at bottom of sidebar, before closing tag
+  const sbEl = document.querySelector('.sidebar');
+  if(sbEl) sbEl.appendChild(indicator);
+  else document.body.appendChild(indicator);
+
+  function showSuccess(){
+    indicator.innerHTML = '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#2e7d5a;flex-shrink:0;"></span>Live · ' + formatDate(new Date());
+    indicator.style.cssText = indicator.style.cssText.replace('rgba(232,99,42,.08)','rgba(46,125,90,.08)').replace('rgba(232,99,42,.2)','rgba(46,125,90,.2)');
+    setTimeout(()=>{ indicator.style.opacity='0'; indicator.style.transition='opacity 1s'; setTimeout(()=>indicator.remove(),1000); }, 6000);
+  }
+
+  function showError(msg){
+    console.warn('OneDrive auto-fetch failed:', msg);
+    indicator.innerHTML = `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#b03030;flex-shrink:0;"></span>Auto-sync unavailable (CORS) — <a href="${shareUrl}" target="_blank" style="color:var(--orange);text-decoration:underline;">open file</a> then upload`;
+    indicator.style.cssText = indicator.style.cssText.replace('rgba(232,99,42,.08)','rgba(176,48,48,.06)').replace('rgba(232,99,42,.2)','rgba(176,48,48,.15)');
+    // Keep visible — it has a useful link
+  }
+
+  function tryFetch(urls, idx){
+    if(idx >= urls.length){ showError('all URLs failed'); return; }
+    fetch(urls[idx], {mode:'cors'})
+      .then(res => {
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.arrayBuffer();
+      })
+      .then(buf => {
+        const wb = XLSX.read(new Uint8Array(buf), {type:'array', cellDates:true});
+        parseWorkbook(wb, 'OneDrive (auto)');
+        showSuccess();
+      })
+      .catch(err => {
+        console.warn(`URL[${idx}] failed:`, err.message);
+        tryFetch(urls, idx + 1);
+      });
+  }
+
+  tryFetch(URLS, 0);
+})();
 // Wire snag upload zone
 const snagZone=document.getElementById("snag-upload-zone");
 if(snagZone){
@@ -7192,24 +7266,26 @@ function renderCriticalTasks(){
 
     <!-- Task table -->
     <div class="panel" style="padding:0;overflow:hidden;">
-      <div style="display:grid;grid-template-columns:1fr 100px 160px 90px;gap:0;padding:8px 18px;background:var(--s2);border-bottom:1px solid var(--border);">
-        <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);">Task</div>
-        <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);">Owner</div>
-        <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);">Remarks</div>
-        <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);">Status</div>
+      <div style="display:grid;grid-template-columns:1fr 90px 90px 70px 90px;gap:8px;padding:8px 18px;background:var(--s3);border-bottom:1px solid var(--border);">
+        <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Task</div>
+        <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Owner</div>
+        <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Planned</div>
+        <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Priority</div>
+        <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Status</div>
       </div>
       ${CRITICAL_TASKS.map((t,i)=>{
         const sc = t.status==='Closed'?'closed':t.status==='In Progress'?'inprog':'open';
         const bg = i%2===0?'var(--s1)':'var(--s2)';
         return `<div class="ct-row" data-owner="${t.owner}" data-status="${t.status}"
-          style="display:grid;grid-template-columns:1fr 100px 160px 90px;gap:0;padding:10px 18px;background:${bg};align-items:start;border-bottom:1px solid var(--border)20;">
-          <div style="font-size:10px;color:var(--text);line-height:1.4;padding-right:12px;">
+          style="display:grid;grid-template-columns:1fr 90px 90px 70px 90px;gap:8px;padding:10px 18px;background:${bg};align-items:start;border-bottom:1px solid var(--border);">
+          <div style="font-size:10px;color:var(--text);line-height:1.4;">
             <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-right:7px;flex-shrink:0;vertical-align:middle;"></span>
             ${t.task}
           </div>
-          <div style="font-size:9px;color:var(--muted);line-height:1.4;">${t.owner}</div>
-          <div style="font-size:9px;color:var(--muted2);line-height:1.4;padding-right:8px;">${t.remarks||'—'}</div>
-          <div><span class="pill ${sc}" onclick="cycleCTPill(this,${i})">${pillLabel(t.status)}</span></div>
+          <div style="font-size:9px;color:var(--muted);line-height:1.4;">${t.owner||'—'}</div>
+          <div style="font-size:9px;color:var(--muted);line-height:1.4;">${t.planned||'—'}</div>
+          <div style="font-size:9px;color:var(--muted);">${t.priority||'—'}</div>
+          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;"><span class="pill ${sc}" onclick="cycleCTPill(this,${i})">${pillLabel(t.status)}</span>${overdueBadge(t.planned,t.status)}</div>
         </div>`;
       }).join('')}
     </div>`;
