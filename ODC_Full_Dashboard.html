@@ -975,9 +975,9 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
       <div id="kpi-tc-visual" style="margin-top:10px;"></div>
     </a>
 
-    <a href="#hoto-project" class="kpi-nav-tile" onclick="event.preventDefault();navToSection('hoto-project');">
+    <a href="#hoto-checklist" class="kpi-nav-tile" onclick="event.preventDefault();navToSection('hoto-checklist');">
       <div class="knt-header">
-        <span class="knt-icon">🏗</span>
+        <span class="knt-icon">✅</span>
         <span class="knt-title">Handover Checklist</span>
         <span class="knt-arrow">→</span>
       </div>
@@ -2837,142 +2837,6 @@ function renderHOTO(){
   emptyDiv.style.cssText="padding:32px;text-align:center;color:var(--muted);font-size:11px;";
   emptyDiv.innerHTML="Upload the master Excel to populate the Handover Checklist.";
   c.appendChild(emptyDiv);
-  return;
-  // ── (legacy hardcoded fallback removed — all data from Excel) ──
-  const _sections=[
-    {title:"General Handover", icon:"📋", items:[
-      "All construction activities completed including restricted areas (as per Annexure D)",
-      "Deep cleaning completed for the premises",
-      "All major and minor snags closed prior to handover",
-      "Minor de-snagging in social spaces planned within 60 days post handover",
-      "All scope of work within agreed battery limits completed",
-      "MEPF and other systems tested & commissioned through 3rd party",
-      "Testing witnessed and signed off by JPMC appointed consultant",
-    ]},
-    {title:"Electrical System", icon:"⚡", items:[
-      "Lighting system commissioned",
-      "Emergency lighting system commissioned",
-      "Socket outlets tested",
-      "Grounding system tested",
-      "Floor electrical panels & DBs commissioned",
-      "UPS & Battery tested with heat run",
-    ]},
-    {title:"Fire & Life Safety", icon:"🔥", items:[
-      "Fire protection system tested",
-      "Fire alarm & detection system tested",
-      "Pre-action sprinkler system tested",
-      "Cause & Effect matrix verified",
-    ]},
-    {title:"HVAC System", icon:"❄️", items:[
-      "Ventilation system commissioned",
-      "Critical room air-conditioning operational",
-      "Air distribution system balanced",
-      "Indoor air quality testing report submitted",
-      "Acoustic levels verified including meeting rooms",
-    ]},
-    {title:"Public Health Engineering", icon:"💧", items:[
-      "Water supply system tested",
-      "Drain system tested",
-    ]},
-    {title:"ELV Systems", icon:"📡", items:[
-      "BMS system commissioned",
-      "Rodent repellent system tested",
-      "Water leakage detection system tested",
-      "VESDA system tested",
-    ]},
-    {title:"Equipment", icon:"🔧", items:[
-      "Kitchen equipment & plumbing systems tested",
-      "Height adjustable workstations installed and tested",
-    ]},
-    {title:"Base Building", icon:"🏗", items:[
-      "Core & shell works completed and ready for use",
-      "All MEPF, Elevators, Façade ready",
-      "Base build testing & commissioning reports shared",
-      "Toilets and elevator lobbies fitted out and commissioned",
-      "External staircase completely fitted out, tested & commissioned including supporting MEPF & elevator licenses secured",
-      "Electrical shafts completed on all floors",
-      "Floor tap offs commissioned for electrical rising mains",
-      "All shafts and façade openings fire sealed",
-      "Parking spaces completed and ready",
-    ]},
-    {title:"Safety", icon:"🦺", items:[
-      "Fire egress staircases and escape paths completed",
-      "Emergency lights and signage installed",
-    ]},
-    {title:"Statutory Approvals", icon:"📜", items:[
-      "CFO Completion Certificate – Base Build",
-      "BMC Completion Certificate – Base Build",
-      "CFO Completion Certificate – Fitout",
-      "BMC Completion Certificate – Fitout",
-      "Approved fit-out drawings available",
-      "Fire NOC",
-      "CEIG approval",
-    ]},
-    {title:"Statutory Compliance", icon:"✅", items:[
-      "RPWD / HG compliance report submitted",
-    ]},
-    {title:"Documentation", icon:"📄", items:[
-      "Statutory architect completion certificate for fitouts",
-      "All requested floor drawings shared with JPMC",
-      "Fit-out guidelines shared with JPMC",
-      "Space completion checklist signed off (Format TBD)",
-      "As-built drawings submitted within 90 days (Fit out, Electrical, Plumbing, FAPA, Sprinklers etc)",
-    ]},
-    {title:"Operations Setup", icon:"⚙️", items:[
-      "Building maintenance agency onboarded",
-    ]},
-    {title:"Logistics", icon:"🚚", items:[
-      "Safe construction access route available",
-      "Labour toilets provided",
-      "Temporary construction power available",
-      "Domestic water supply available at pantry",
-      "Service lift with attendant available for fitout works",
-      "Temporary material storage area provided",
-    ]},
-    {title:"C&E Matrix", icon:"🔗", items:[
-      "C&E Matrix verification",
-    ]},
-    {title:"IAQ & Air Flushing", icon:"🌬️", items:[
-      "IAQ test post air flushing",
-    ]},
-    {title:"Acoustic Testing", icon:"🔊", items:[
-      "Acoustic testing as per DBR",
-    ]},
-  ];
-
-  // Populate HC category filter
-  const hcCatSel=document.getElementById('fhc-cat');
-  if(hcCatSel && hcCatSel.options.length<=1){
-    sections.forEach(s=>{const o=document.createElement('option');o.value=s.title;o.textContent=s.title;hcCatSel.appendChild(o);});
-  }
-  sections.forEach((sec,i)=>{
-    const id=`hoto-proj-${i}`;
-    const div=document.createElement("div");
-    div.className="acc-item"; div.id=id;
-    div.innerHTML=`
-      <div class="acc-hdr" onclick="toggleAcc('${id}')">
-        <div class="acc-num" style="font-size:15px;width:auto;padding-right:8px">${sec.icon}</div>
-        <div class="acc-info">
-          <div class="acc-name">${sec.title}</div>
-          <div class="acc-meta">${sec.items.length} checklist items</div>
-        </div>
-        <div class="acc-right">
-          <div class="acc-bar-wrap"><div class="acc-bar-fill" id="${id}-bar" style="width:0%;background:#232b3a"></div></div>
-          <div class="acc-pct" id="${id}-pct" style="color:var(--muted2)">0%</div>
-          <div class="acc-chevron">▼</div>
-        </div>
-      </div>
-      <div class="acc-body">
-        <div class="sub-hdr grid-4" style="display:grid;grid-template-columns:1fr 120px;padding:10px 18px 6px;"><div>Checklist Item</div><div>Status</div></div>
-        ${sec.items.map((it,si)=>`
-          <div class="sub-row" style="display:grid;grid-template-columns:1fr 120px;gap:10px;padding:8px 18px;">
-            <div class="sub-scope">${it}</div>
-            <div><span class="pill open" id="${id}-sub-${si}" onclick="cycleHOTOPill(this,'${id}',${sec.items.length})">${pillLabel("Open")}</span></div>
-          </div>
-        `).join("")}
-      </div>`;
-    c.appendChild(div);
-  });
 }
 
 function cycleHOTOPill(el,id,total){
@@ -4298,7 +4162,7 @@ function parseWorkbook(wb, filename){
         const owner   =(safeStr(r[7])&&safeStr(r[7])!=="nan")?safeStr(r[7]):"—";
         const plannedBBraw=r[8] instanceof Date?formatDate(r[8]):safeStr(r[8])&&safeStr(r[8])!=="nan"?safeStr(r[8]):"";
         const priority=(safeStr(r[11])&&safeStr(r[11])!=="nan")?safeStr(r[11]):"Medium";
-        if(!item||item==="nan"||item==="Checklist Item") continue;
+        if(!item||item==="nan"||item==="Checklist Item"||item==="Sr No") continue;
         const key=cat!=="nan"?cat:"Other";
         if(!newBB[key]) newBB[key]=[];
         const plannedBB=r[8] instanceof Date?formatDate(r[8]):safeStr(r[8])&&safeStr(r[8])!=="nan"?safeStr(r[8]):"";
@@ -4403,18 +4267,21 @@ function parseWorkbook(wb, filename){
       const rows=XLSX.utils.sheet_to_json(wb.Sheets["T&C"],{header:1,defval:""});
       // Cols: 0=SrNo 1=Services 2=Subcategory 3=Activity 4=Status 5=Owner 6=Planned 7=Actual 8=Remarks 9=Priority
       const newTC={};
+      let lastSvc="General";
       for(let i=1;i<rows.length;i++){
         const r=rows[i];
         const srNo=safeStr(r[0]);
-        if(!srNo||srNo==="nan"||srNo==="Sr No") continue;
-        const service=safeStr(r[1])!=="nan"?safeStr(r[1]):"General";
+        if(srNo==="Sr No") continue; // skip repeated header
+        const rawSvc=safeStr(r[1]);
+        const service=(rawSvc&&rawSvc!=="nan")?rawSvc:lastSvc;
+        if(rawSvc&&rawSvc!=="nan") lastSvc=rawSvc;
         const sub    =safeStr(r[2])!=="nan"?safeStr(r[2]):"";
         const act    =safeStr(r[3])!=="nan"?safeStr(r[3]):"";
         const status =safeStr(r[4])&&safeStr(r[4])!=="nan"?safeStr(r[4]):"Open";
         const owner  =safeStr(r[5])!=="nan"?safeStr(r[5]):"";
         const remarks=safeStr(r[8])!=="nan"?safeStr(r[8]):"";
         const priority=safeStr(r[9])!=="nan"?safeStr(r[9]):"";
-        if(!act&&!sub) continue;
+        if(!act&&!sub) continue; // skip blank rows
         if(!newTC[service]) newTC[service]={items:[]};
         const plannedTC=r[6] instanceof Date?formatDate(r[6]):safeStr(r[6])&&safeStr(r[6])!=="nan"?safeStr(r[6]):"";
         newTC[service].items.push({sub,item:act,status,owner,remarks,priority,planned:plannedTC});
@@ -4432,24 +4299,27 @@ function parseWorkbook(wb, filename){
     try{
       const rows=XLSX.utils.sheet_to_json(wb.Sheets["Handover checklist"],{header:1,defval:""});
       // Cols: 0=SrNo 1=Category 2=ChecklistItem 3=Status 4=Reference 5=Owner 6=Planned 7=Actual 8=Remarks 9=Priority
-      const newHC={}; // {category: [{item,status,owner,remarks}]}
+      const newHC={};
+      let lastCat="General";
       for(let i=1;i<rows.length;i++){
         const r=rows[i];
+        // Skip the header row if it repeats, and completely blank rows
         const srNo=safeStr(r[0]);
-        if(!srNo||srNo==="nan"||srNo==="Sr No") continue;
-        const cat   =safeStr(r[1])!=="nan"?safeStr(r[1]):"General";
-        const item  =safeStr(r[2])!=="nan"?safeStr(r[2]):"";
+        if(srNo==="Sr No") continue; // skip repeated header
+        const item=safeStr(r[2])&&safeStr(r[2])!=="nan"?safeStr(r[2]):"";
+        if(!item) continue; // skip blank item rows
+        const rawCat=safeStr(r[1]);
+        const cat=(rawCat&&rawCat!=="nan")?rawCat:lastCat;
+        if(rawCat&&rawCat!=="nan") lastCat=rawCat;
         const status=safeStr(r[3])&&safeStr(r[3])!=="nan"?safeStr(r[3]):"Open";
-        const owner =safeStr(r[5])!=="nan"?safeStr(r[5]):"";
-        const remarks=safeStr(r[8])!=="nan"?safeStr(r[8]):"";
-        if(!item) continue;
+        const owner =safeStr(r[5])&&safeStr(r[5])!=="nan"?safeStr(r[5]):"";
+        const remarks=safeStr(r[8])&&safeStr(r[8])!=="nan"?safeStr(r[8]):"";
         if(!newHC[cat]) newHC[cat]=[];
         const plannedHC=r[6] instanceof Date?formatDate(r[6]):safeStr(r[6])&&safeStr(r[6])!=="nan"?safeStr(r[6]):"";
         const priorityHC=safeStr(r[9])&&safeStr(r[9])!=="nan"?safeStr(r[9]):"—";
         newHC[cat].push({item,status,owner,remarks,planned:plannedHC,priority:priorityHC});
       }
       if(Object.keys(newHC).length>0){
-        // Store in a global so renderHOTO can use it
         window._HC_FROM_EXCEL=newHC;
         parsed++;
       }
@@ -4524,18 +4394,21 @@ function parseWorkbook(wb, filename){
       const offPlan   = hasSource ? 7 : 6;
       const offPrio   = hasSource ? 10 : 9;
       const newOA=[];
+      let lastCatOA="General";
       for(let i=1;i<rows.length;i++){
         const r=rows[i];
         const srNo=safeStr(r[0]);
-        if(!srNo||srNo==="nan"||srNo==="Sr No") continue;
-        const cat   =safeStr(r[offCat])!=="nan"?safeStr(r[offCat]):"";
+        if(srNo==="Sr No") continue; // skip repeated header
+        const rawCatOA=safeStr(r[offCat]);
+        const cat=(rawCatOA&&rawCatOA!=="nan")?rawCatOA:lastCatOA;
+        if(rawCatOA&&rawCatOA!=="nan") lastCatOA=rawCatOA;
         const sub   =safeStr(r[offSub])!=="nan"?safeStr(r[offSub]):"";
         const desc  =safeStr(r[offDesc])!=="nan"?safeStr(r[offDesc]):"";
         const status=safeStr(r[offStatus])&&safeStr(r[offStatus])!=="nan"?safeStr(r[offStatus]):"Open";
         const owner =safeStr(r[offOwner])!=="nan"?safeStr(r[offOwner]):"";
         const prio  =safeStr(r[offPrio])!=="nan"?safeStr(r[offPrio]):"High";
         const plannedOA=r[offPlan] instanceof Date?formatDate(r[offPlan]):safeStr(r[offPlan])&&safeStr(r[offPlan])!=="nan"?safeStr(r[offPlan]):"";
-        if(!cat&&!desc) continue;
+        if(!desc) continue; // skip blank rows
         newOA.push({cat,sub,desc,status,owner,priority:prio,planned:plannedOA});
       }
       if(newOA.length>0){
@@ -4582,6 +4455,7 @@ function parseWorkbook(wb, filename){
       const rows=XLSX.utils.sheet_to_json(wb.Sheets["Critical Tasks"],{header:1,defval:""});
       // Actual cols: 0=SrNo 1=Category 2=Subcategory 3=Activity 4=Status 5=Owner 6=Planned 7=Actual 8=Remarks 9=Priority
       const newCT=[];
+      let lastCatCT="General";
       for(let i=1;i<rows.length;i++){
         const r=rows[i];
         const srNo=safeStr(r[0]);
@@ -4592,7 +4466,9 @@ function parseWorkbook(wb, filename){
         const owner   =safeStr(r[5])&&safeStr(r[5])!=="nan"?safeStr(r[5]):"—";
         const remarks =safeStr(r[8])&&safeStr(r[8])!=="nan"?safeStr(r[8]):"";
         const priority=safeStr(r[9])&&safeStr(r[9])!=="nan"?safeStr(r[9]):"High";
-        const cat     =safeStr(r[1])&&safeStr(r[1])!=="nan"?safeStr(r[1]):"";
+        const rawCatCT=safeStr(r[1]);
+        const cat=(rawCatCT&&rawCatCT!=="nan")?rawCatCT:lastCatCT;
+        if(rawCatCT&&rawCatCT!=="nan") lastCatCT=rawCatCT;
         if(!task) continue;
         const plannedCT=r[6] instanceof Date?formatDate(r[6]):safeStr(r[6])&&safeStr(r[6])!=="nan"?safeStr(r[6]):"—";
         newCT.push({task, cat, owner, remarks, status, priority, planned:plannedCT});
@@ -6723,7 +6599,7 @@ function renderProgressBanner(){
 
     const metrics=[
       {label:"T&C",              pct:tcPct,   col:"#2e7d5a", total:tcTotal,    done:tcDone,    href:"#hoto-tc"},
-      {label:"Handover",         pct:hcPct,   col:"#7a4e9a", total:hcTotal,    done:hcDone,    href:"#hoto-project"},
+      {label:"Handover",         pct:hcPct,   col:"#7a4e9a", total:hcTotal,    done:hcDone,    href:"#hoto-checklist"},
       {label:"Base Build",       pct:bbPct,   col:"#f0a500", total:bbTotal,    done:bbDone,    href:"#hoto-bb"},
       {label:"Snags",            pct:snagPct, col:"#b03030", total:snagTotal,  done:snagDone,  href:"#hoto-snag"},
       {label:"Hiring",           pct:hPct,    col:"#2e7d5a", total:hTotal,     done:hDone,     href:"#hiring"},
@@ -7016,6 +6892,21 @@ Respond in a friendly, expert tone. If a question is about something in the work
   document.getElementById("chat-input").focus();
 }
 
+// Pre-populate all trackers from embedded data — overwritten on Excel upload
+if(!window._HC_FROM_EXCEL){
+  window._HC_FROM_EXCEL = {"General Handover": [{"item": "All construction activities completed including restricted areas (as per Annexure D)\nDeep cleaning completed for the premises\nAll major and minor snags closed prior to handover\nMinor de‑snagging in social spaces planned within 60 days post handover", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "2026-03-31 00:00:00", "remarks": ""}], "MEPF and Other Systems": [{"item": "All scope of work within agreed battery limits completed. MEPF and other systems tested & commissioned through 3rd party. Testing witnessed and signed off by JPMC appointed consultant", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "2026-03-31 00:00:00", "remarks": ""}, {"item": "Electrical System - Lighting system commissioned", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Electrical System - Emergency lighting system commissioned", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Electrical System - Socket outlets tested", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Electrical System - Grounding system tested", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Electrical System - Floor electrical panels & DBs commissioned", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Electrical System - UPS & Battery tested with heat run", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Fire & Life Safety - Fire protection system tested", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Fire & Life Safety - Fire alarm & detection system tested", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Fire & Life Safety - Pre‑action sprinkler system tested", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Fire & Life Safety - Cause & Effect matrix verified", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "HVAC System - Ventilation system commissioned", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "HVAC System - Critical room air‑conditioning operational", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "HVAC System - Air distribution system balanced", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "HVAC System - Indoor air quality testing report submitted", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "HVAC System - Acoustic levels verified including meeting rooms", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Public Health Engineering - Water supply system tested", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Public Health Engineering - Drain system tested", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "ELV Systems - BMS system commissioned", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "ELV Systems - Rodent repellent system tested", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "ELV Systems - Water leakage detection system tested", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "ELV Systems - VESDA system tested", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Equipment - Kitchen equipment & plumbing systems tested", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Equipment - Height adjustable workstations installed and tested", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}], "Base Building": [{"item": "Core & shell works completed and ready for use", "status": "Open", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "All MEPF, Elevators, Façade ready", "status": "In Progress", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Base build testing & commissioning reports shared", "status": "Open", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Toilets and elevator lobbies fitted out and commissioned", "status": "In Progress", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "External staircase completely fitted out, tested & commissioned including supporting MEPF & elevator licenses secured.", "status": "In Progress", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Electrical shafts completed on all floors", "status": "In Progress", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Floor tap offs commissioned for electrical rising mains", "status": "In Progress", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "All shafts and façade openings fire sealed", "status": "Open", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Parking spaces completed and ready", "status": "Open", "owner": "Ansuman", "priority": "High", "planned": "2026-03-28 00:00:00", "remarks": ""}], "Safety": [{"item": "Fire egress staircases and escape paths completed", "status": "In Progress", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Emergency lights and signage installed", "status": "Open", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}], "Statutory Approvals": [{"item": "CFO Completion Certificate – Base Build", "status": "Closed", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "BMC Completion Certificate – Base Build", "status": "Open", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "CFO Completion Certificate – Fitout", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-04-02 00:00:00", "remarks": ""}, {"item": "BMC Completion Certificate – Fitout", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Approved fit‑out drawings available", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Fire NOC", "status": "In Progress", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "CEIG approval", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}], "Statutory Compliance": [{"item": "RPWD / HG compliance report submitted", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-04-30 00:00:00", "remarks": ""}], "Documentation": [{"item": "Statutory architect completion certificate for fitouts", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "All requested floor drawings shared with JPMC", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Fit‑out guidelines shared with JPMC", "status": "Open", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Space completion checklist signed off (Format TBD)", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "As‑built drawings submitted within 90 days (Fit out, Electrical, Plumbing, FAPA, Sprinklers etc)", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-06-30 00:00:00", "remarks": ""}], "Operations Setup": [{"item": "Building maintenance agency onboarded", "status": "Closed", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}], "Logistics": [{"item": "Safe construction access route available", "status": "Open", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Labour toilets provided", "status": "In Progress", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Temporary construction power available", "status": "Open", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Domestic water supply available at pantry", "status": "In Progress", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Service lift with attendant available for fitout works", "status": "Open", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}, {"item": "Temporary material storage area provided", "status": "Open", "owner": "Ansuman", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}], "C&E Matrix": [{"item": "C&E Matrix verification", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}], "IAQ report - Air Flushing": [{"item": "IAQ test post air flushing", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}], "Acoustic Testing": [{"item": "Acoustic testing as per DBR", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "2026-03-15 00:00:00", "remarks": ""}]};
+}
+(function(){
+  // TC
+  const _tcInit = {"Electrical": {"items": [{"sub": "LT PANEL", "item": "Torque verification", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "LT PANEL", "item": "Primary current injection", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "LT PANEL", "item": "Milli-volt drop test", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "LT PANEL", "item": "Verification of breaker discrimination setting", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "LT PANEL", "item": "Commissioning", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "LT PANEL", "item": "Functional", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "LT PANEL", "item": "Verification of BMS interface", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Cables", "item": "Cable verification", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Cables", "item": "Continuity & Cable resistance", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Cables", "item": "Insulation resistance", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Cables", "item": "Lug contact resistance", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Distribution system", "item": "Cable Verification", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Distribution system", "item": "IR test", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Distribution system", "item": "Continuity & Cable resistance", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Distribution system", "item": "RCD testing", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Distribution system", "item": "Functional test", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Socket", "item": "Circuit verification", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Socket", "item": "Polarity testing", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Socket", "item": "Earth loop impedance testing", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Socket", "item": "Circuit verification", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Lighting", "item": "General lighting lux", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "28-Mar-2026", "remarks": ""}, {"sub": "Lighting", "item": "Emergency lighting lux", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Lighting", "item": "Emergency lighting system functional verification", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Lighting", "item": "LMS Verification", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "UPS", "item": "Factory & Site Acceptance Test with min 4 Hrs Heat Run at Full Load Capacity", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "PAC", "item": "Factory & Site Acceptance Test with min 4 Hrs Heat Run at Full Load Capacity", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Kitchen Equipment Dry Run", "item": "Full Load test of all Kitchen equipment prior to commencement of site operation; Drainoscopy", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "28-Mar-2026", "remarks": ""}, {"sub": "MER Room", "item": "Heat Run Test of MER Room by resistive Load & data loggers at Full IT load capacity before Room Ready Handover condition to JPMC GTI team", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "TR Room", "item": "Heat Run Test of TR Room by resistive Load & data loggers at Full IT load capacity before Room Ready Handover condition to JPMC GTI team", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}]}, "HVAC": {"items": [{"sub": "AHU", "item": "Commissioning of unit", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "AHU", "item": "Duct pressure testing", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "AHU", "item": "VAV commissioning", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "AHU", "item": "Air balancing", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "28-Mar-2026", "remarks": ""}, {"sub": "AHU", "item": "Fresh air modulation based on CO2 & DP sensor", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "AHU", "item": "FAS interface verification", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "AHU", "item": "BMS interface verification", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "VRF / PAC", "item": "Triple vacuuming", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "VRF / PAC", "item": "Commissioning", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "VRF / PAC", "item": "Functional test", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "VRF / PAC", "item": "FAS interface verification", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "VRF / PAC", "item": "BMS interface verification", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}]}, "FPS & FAPA": {"items": [{"sub": "FAPA", "item": "Verification of detector & speakers", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "FAPA", "item": "Loop verification", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "FAPA", "item": "Verification as per cause and effect matrix", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "FAPA", "item": "Verification of interface with repeater panel and BMS", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "FAPA", "item": "Verification of fire panel power supply", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Sprinkler", "item": "Verification of sprinkler installation", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Sprinkler", "item": "Sprinkler pipe pressure test", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Sprinkler", "item": "Verification of flow & tamper switch", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Sprinkler", "item": "Verification of FAS integration", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Sprinkler", "item": "BMS interface verification", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}]}, "PHE": {"items": [{"sub": "Water supply/drainage system", "item": "Verification of Flow rate", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Water supply/drainage system", "item": "Supply pressure test", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Water supply/drainage system", "item": "Drain leak test", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}]}, "Miscellaneous": {"items": [{"sub": "WLD", "item": "Testing of WLD sensor & verification of interface with WLD panel", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "WLD", "item": "Verification of interface with BMS", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "RRS", "item": "Check Db at the satellites", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "RRS", "item": "Verification of interface with RRS panel", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "BMS", "item": "DDC panel verification", "status": "In Progress", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "BMS", "item": "IO points & Graphics verification", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "BMS", "item": "Operational checks", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "15-Mar-2026", "remarks": ""}, {"sub": "Building IST with High Side", "item": "Integrated System Testing along with Building High Side & fitout works as per mutually agreed testing methodology. BMS system with all 3rd party Integration for Base Built and fitout works to be completed before IST.", "status": "Open", "owner": "Nirav", "priority": "High", "planned": "28-Mar-2026", "remarks": ""}, {"sub": "Appointment of 3rd party consultant", "item": "Appointment of 3rd party consultant for all testing and commissioning activities", "status": "Closed", "owner": "Nirav", "priority": "High", "planned": "01-Mar-2026", "remarks": ""}]}};
+  Object.keys(_tcInit).forEach(k=>{ if(!TC_DATA[k]) TC_DATA[k]=_tcInit[k]; else if(!TC_DATA[k].items.length) TC_DATA[k]=_tcInit[k]; });
+  // OA
+  const _oaInit = [{"cat": "Manpower", "sub": "BGV", "desc": "Prudential, Spectra, Winchester BGV to be done", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Manpower", "sub": "BGV", "desc": "CW and BP Team BGV to be done", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Manpower", "sub": "BGV", "desc": "Projects team BGV to be done", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Manpower", "sub": "Access", "desc": "Access cards for all team members", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Manpower", "sub": "Roster", "desc": "Roster and reliever plan to be finalised", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "25-Mar-2026"}, {"cat": "Finance", "sub": "Insurance", "desc": "Centre and fit outs to be included in insurance", "status": "Open", "owner": "CW Finance", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Finance", "sub": "DOA", "desc": "DOA to be updated", "status": "Open", "owner": "CW Finance", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Operations", "sub": "Key Cabinet", "desc": "Ensure a key cabinet is in place\n* Locker master key\n* False flooring keys\n* Panel / Shaft keys\n* MR Keys\n* Terrace doors\n* Other keys", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Operations", "sub": "Pest Control", "desc": "Pest Control report action points to be closed out", "status": "In Progress", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Operations", "sub": "Pest Control", "desc": "Pest Control report format for BAU to be aligned on with JPMC", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Operations", "sub": "Checklists and Reports", "desc": "All Report formats to be reviewed with JPMC", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Operations", "sub": "Security Role", "desc": "Review CW Security tasks reassignment", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Operations", "sub": "Procurement", "desc": "Budget upload done for all Operational procurement", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Operations", "sub": "Horticulture", "desc": "Plant maintenance vendor deployed", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Operations", "sub": "Asset Maintenance", "desc": "AMC vendors deployed", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Operations", "sub": "General", "desc": "Office space identified  within the building for BP / CW team.", "status": "Open", "owner": "Nihareeka", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Operations", "sub": "OSNE", "desc": "OSNE tracker to be updated", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "JPMC feedback", "desc": "Ventillations in shafts", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "JPMC feedback", "desc": "Remove window handles - GS Observation (Closure critical)", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "JPMC feedback", "desc": "6th floor door opening to the wrong side (Lift landing to WS area)", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "JPMC feedback", "desc": "Ensure no overlapping earthing", "status": "In Progress", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "JPMC feedback", "desc": "Access for TR Rooms AC units / Panels", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "JPMC feedback", "desc": "1 AGT per floor", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "JPMC feedback", "desc": "Knobs instead of handles inside AGT rooms?", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "JPMC feedback", "desc": "All Fire resistant doors shall be put up", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "JPMC feedback", "desc": "Male washrooms door changes on a few floors", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "JPMC feedback", "desc": "Hand drier required or not / Cover holes?", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "JPMC feedback", "desc": "Tile between 2 WCs?", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "CCTV blind spot check", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Fire door certificates", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Panel room openings closure", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Fire shaft glasses", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Lights alignment", "status": "In Progress", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Lux check and fixing for all lights", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Light sensor coverage", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Pannel Tagging", "status": "In Progress", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Sattelite dish procurement and installation", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Key things for WS (Lights, Acoustic, Safety)", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Plants intent and closure check", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Artwork and graphics plan", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Level 5 and 7 pocket terrace check", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Gap enhancement items completion status", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Turnstile glass: When is this being put up", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Projects", "sub": "Key things to check", "desc": "Power requirement for coffee cart (Core cutting?) Coffee Cart operated by JPMC?", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Operations", "sub": "Post Handover Alignment", "desc": "Alignment on spaces post 1st April", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Operations", "sub": "Fire Staircase", "desc": "CW to ensure no obstacles in the staircase post handover (Once dry runs start)", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}, {"cat": "Operations", "sub": "Training", "desc": "MEP trainings to be organised on escalation matrix etc.", "status": "Open", "owner": "Dipasha", "priority": "High", "planned": "15-Mar-2026"}];
+  if(!OA_DATA.length) _oaInit.forEach(x=>OA_DATA.push(x));
+  // CT
+  const _ctInit = [{"task": "Synopsis meeting to be setup with CW team", "cat": "Critical Tasks", "owner": "Nikhil", "remarks": "Request sent to Shruthi", "status": "In Progress", "priority": "Medium", "planned": ""}, {"task": "Payment tracking for payments to be collected from JPMC", "cat": "Critical Tasks", "owner": "Nikhil", "remarks": "Details to be taken from Saurabh Sangal. Request sent", "status": "Closed", "priority": "Medium", "planned": ""}, {"task": "April Cost to understand EBIDTA impact", "cat": "Critical Tasks", "owner": "Nikhil", "remarks": "Details to be taken from Saurabh Sangal", "status": "Closed", "priority": "Medium", "planned": ""}, {"task": "Meeting to be organised with JPMC food vendor (Complete understanding on kitchen operations to be obtained) (LPG, Equipment APCs, Manpower hiring etc)", "cat": "Critical Tasks", "owner": "Nihareeka", "remarks": "Agenda to be decided and meeting to be set up\n* Cafeteria cleaning expectation and scope documentation\n* Kitchen equipment maintenance scope clarity\n* Kitchen Oil and Garbage disposal\n* Kitchen cleaning equipment/ chemicals list", "status": "Open", "priority": "High", "planned": ""}, {"task": "Building HSE audit by CW SME", "cat": "Critical Tasks", "owner": "Dipasha", "remarks": "Fire, Safety, Trip Hazards, Food Handling, Workplace safety", "status": "In Progress", "priority": "High", "planned": ""}, {"task": "Building MEP audit by CW SME", "cat": "Critical Tasks", "owner": "Dipasha", "remarks": "", "status": "Open", "priority": "High", "planned": ""}, {"task": "All trackers to be updated", "cat": "Critical Tasks", "owner": "Multiple", "remarks": "", "status": "In Progress", "priority": "High", "planned": ""}, {"task": "Review hiring plan and balance positions", "cat": "Critical Tasks", "owner": "Nihareeka / Dipasha", "remarks": "Senior MEP resources hiring (Raj (C&I) and Sohail (Electrical)", "status": "In Progress", "priority": "High", "planned": ""}, {"task": "JPMC Consolidated tracker to be created", "cat": "Critical Tasks", "owner": "Nihareeka", "remarks": "List of points pending with JPMC", "status": "Open", "priority": "High", "planned": ""}, {"task": "Pest Control team to be depolyed", "cat": "Critical Tasks", "owner": "Dipasha", "remarks": "Immediate deployment", "status": "Closed", "priority": "High", "planned": ""}, {"task": "Uniforms next steps to be initiated", "cat": "Critical Tasks", "owner": "Nihareeka / Dipasha", "remarks": "", "status": "Open", "priority": "High", "planned": ""}, {"task": "Pest Control action points closure", "cat": "Critical Tasks", "owner": "Dipasha", "remarks": "", "status": "In Progress", "priority": "High", "planned": ""}, {"task": "JPMC NKP Office visit to be organised along with Ops workshop", "cat": "Critical Tasks", "owner": "Nihareeka", "remarks": "", "status": "Open", "priority": "High", "planned": ""}, {"task": "OSNE deliveries to be checked and risks flagged", "cat": "Critical Tasks", "owner": "Dipasha", "remarks": "", "status": "Open", "priority": "High", "planned": ""}, {"task": "PES for CW, BP etc", "cat": "Critical Tasks", "owner": "Nihareeka", "remarks": "Mail: JPMC Registration", "status": "Open", "priority": "Medium", "planned": ""}, {"task": "PES to be intiated for all", "cat": "Critical Tasks", "owner": "Dipasha", "remarks": "", "status": "Open", "priority": "High", "planned": ""}, {"task": "Turnstile activation date to be found out from JPMC", "cat": "Critical Tasks", "owner": "Nihareeka", "remarks": "", "status": "Open", "priority": "High", "planned": "25-Mar-2026"}, {"task": "Call to be taken on unifroms cost and tablet procurement", "cat": "Critical Tasks", "owner": "Nihareeka", "remarks": "", "status": "Open", "priority": "High", "planned": ""}, {"task": "Establish BMS Operation clarity (CW Technicians sit on which floor) (Are BMS connections done correctly as per scope)", "cat": "Critical Tasks", "owner": "Dipasha", "remarks": "", "status": "Open", "priority": "High", "planned": ""}];
+  if(!CRITICAL_TASKS.length) _ctInit.forEach(x=>CRITICAL_TASKS.push(x));
+})();
 renderHOTO();
 renderTC();
 renderSnag();
