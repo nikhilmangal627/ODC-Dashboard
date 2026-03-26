@@ -4,77 +4,98 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JPMC Dashboard — ODC Mumbai</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg:#0b0e14; --s1:#131720; --s2:#1a2030; --s3:#212840;
-  --border:#232b3a; --border2:#2d3a50;
-  --teal:#00d4b4; --amber:#f0a500; --red:#ff4d6d; --purple:#a78bfa;
-  --text:#e8edf5; --muted:#6b7a99; --muted2:#4a5a78;
-  --font-d:'Syne',sans-serif; --font-m:'DM Mono',monospace;
+  /* ── Cowrks Light Mode — Cream & Orange ── */
+  --bg:#faf6f0; --s1:#fdf8f3; --s2:#f5efe6; --s3:#ede4d8;
+  --border:#e0d5c8; --border2:#cdc0b0;
+  /* RAG — earthy tones, no neon */
+  --teal:#2e7d5a;   /* sage green   — done/positive  */
+  --amber:#f0a500;  /* burnt orange — in progress     */
+  --red:#b03030;    /* terracotta   — risk/open       */
+  --purple:#7a4e9a; /* muted plum   — secondary       */
+  /* Brand */
+  --orange:#e8632a; --orange-lt:#fff4ee; --orange-bd:#f0a070;
+  /* Text */
+  --text:#2a1e14; --muted:#8a7e72; --muted2:#b8aa9e;
+  /* Fonts — Calibri system font with web fallback */
+  --font-d:'Calibri','Lato','Segoe UI',sans-serif;
+  --font-m:'Calibri','Lato','Segoe UI',sans-serif;
 }
-html.light {
-  --bg:#dde3ed; --s1:#f0f3f8; --s2:#e4e9f2; --s3:#d8dfe9;
-  --border:#b8c2d4; --border2:#9aaabf;
-  --teal:#006fa3; --amber:#a05c00; --red:#b01c2e; --purple:#5a35a0;
-  --text:#0d1420; --muted:#4a5670; --muted2:#7a8aa8;
+html.dark {
+  --bg:#0f0d0b; --s1:#2c2622; --s2:#362e28; --s3:#40382e;
+  --border:#3a3028; --border2:#4a3e32;
+  --teal:#5aaa80; --amber:#e8822a; --red:#c46060; --purple:#9a78c0;
+  --orange:#e8632a; --orange-lt:#2a1c10; --orange-bd:#8a4018;
+  --text:#e8ddd0; --muted:#7a6e62; --muted2:#5a4e42;
+  --font-d:'Calibri','Lato','Segoe UI',sans-serif;
+  --font-m:'Calibri','Lato','Segoe UI',sans-serif;
 }
-html.light body{background:var(--bg);color:var(--text);}
-html.light body::before{background-image:linear-gradient(rgba(0,80,140,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,80,140,.025) 1px,transparent 1px);}
-html.light .kpi.k-red .kl{color:var(--muted);}
-html.light .kpi.k-red .ks{color:var(--muted);}
-html.light .kpi.k-red .kv{color:var(--red);}
-html.light .rev-table tr:nth-child(even) td{background:var(--s2);}
+html.dark body{background:var(--bg);color:var(--text);}
+html.dark .sidebar{background:var(--s1);border-right-color:var(--border);}
+html.dark .kpi, html.dark .kpi-nav-tile, html.dark .panel{background:var(--s1);}
+html.dark body::before{background-image:linear-gradient(rgba(255,120,50,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,120,50,.015) 1px,transparent 1px);}
+html.dark .kpi.k-red .kl{color:var(--muted);}
+html.dark .kpi.k-red .ks{color:var(--muted);}
+html.dark .kpi.k-red .kv{color:var(--red);}
+html.dark .rev-table tr:nth-child(even) td{background:var(--s2);}
 /* Toggle button */
-.theme-btn{display:flex;align-items:center;gap:7px;margin:8px 14px;padding:7px 12px;background:rgba(0,212,180,.07);border:1px solid rgba(0,212,180,.18);border-radius:8px;cursor:pointer;user-select:none;transition:background .15s;}
-.theme-btn:hover{background:rgba(0,212,180,.14);}
+.theme-btn{display:flex;align-items:center;gap:7px;margin:8px 14px;padding:7px 12px;background:rgba(232,99,42,.07);border:1px solid rgba(232,99,42,.18);border-radius:8px;cursor:pointer;user-select:none;transition:background .15s;}
+.theme-btn:hover{background:rgba(232,99,42,.14);}
 .theme-btn-icon{font-size:13px;line-height:1;}
 .theme-btn-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);flex:1;}
-.theme-btn-track{width:30px;height:16px;border-radius:8px;background:rgba(0,212,180,.2);border:1px solid rgba(0,212,180,.3);position:relative;flex-shrink:0;transition:background .2s;}
-.theme-btn-thumb{position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--teal);transition:transform .2s;}
-html.light .theme-btn-track{background:var(--teal);}
-html.light .theme-btn-thumb{transform:translateX(14px);background:#fff;}
+.theme-btn-track{width:30px;height:16px;border-radius:8px;background:rgba(232,99,42,.2);border:1px solid rgba(232,99,42,.3);position:relative;flex-shrink:0;transition:background .2s;}
+.theme-btn-thumb{position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--orange);transition:transform .2s;}
+html.dark .theme-btn-track{background:var(--orange);}
+html.dark .theme-btn-thumb{transform:translateX(14px);background:#fff;}
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:var(--font-m);min-height:100vh;overflow-x:hidden;}
 
 /* ── GRID BACKGROUND — no z-index, no pointer interference ── */
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,180,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,180,.018) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(200,120,50,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(200,120,50,.04) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;}
 
 /* ── LAYOUT — sidebar OUTSIDE main wrapper, no competing z-index ── */
-.sidebar{width:220px;background:var(--s1);border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;overflow-y:auto;}
+.sidebar{width:220px;background:var(--s2);border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;overflow-y:auto;transition:width .25s ease,transform .25s ease;}
+.sidebar.collapsed{width:0;overflow:hidden;border-right:none;}
+.sidebar-toggle-btn{display:flex;align-items:center;justify-content:space-between;padding:10px 18px 8px;cursor:pointer;border-bottom:1px solid var(--border);font-size:10px;color:var(--muted);user-select:none;}
+.sidebar-toggle-btn:hover{color:var(--orange);}
+.sidebar-toggle-icon{font-size:14px;transition:transform .2s;}
+.sidebar.collapsed .sidebar-toggle-icon{transform:rotate(180deg);}
+.main{margin-left:220px;padding:32px 36px 80px;}
 .main{margin-left:220px;padding:32px 36px 80px;}
 
 /* ── SIDEBAR LINKS — real anchors ── */
 .sb-link{display:flex;align-items:center;gap:8px;padding:8px 18px;font-size:10px;color:var(--muted);cursor:pointer;transition:all .15s;border-left:2px solid transparent;text-decoration:none;}
-.sb-link:hover{color:var(--text);background:rgba(0,212,180,.06);border-left-color:rgba(0,212,180,.3);}
-.sb-link.active{color:var(--teal);background:rgba(0,212,180,.08);border-left-color:var(--teal);}
+.sb-link:hover{color:var(--orange);background:rgba(232,99,42,.06);border-left-color:rgba(232,99,42,.3);}
+.sb-link.active{color:#8a2c00;background:rgba(232,99,42,.1);border-left-color:var(--orange);font-weight:600;}
 .sb-link .sb-icon{font-size:12px;width:16px;text-align:center;flex-shrink:0;}
 
 /* ── SIDEBAR MISC ── */
 .sb-logo{padding:22px 18px 16px;border-bottom:1px solid var(--border);}
-.sb-logo .proj{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:4px;}
+.sb-logo .proj{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#2e7d5a;margin-bottom:4px;}
 .sb-logo .name{font-family:var(--font-d);font-size:14px;font-weight:800;color:var(--text);line-height:1.2;}
 .sb-logo .sub{font-size:9px;color:var(--muted);margin-top:3px;}
 .sb-lcd{margin:12px 14px;background:rgba(0,212,180,.08);border:1px solid rgba(0,212,180,.2);border-radius:8px;padding:10px 12px;}
 .sb-lcd .lcd-lbl{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
-.sb-lcd .lcd-val{font-family:var(--font-d);font-size:15px;font-weight:800;color:var(--teal);}
+.sb-lcd .lcd-val{font-family:var(--font-d);font-size:15px;font-weight:800;color:#2e7d5a;}
 .sb-lcd .lcd-days{font-size:9px;color:var(--amber);margin-top:2px;}
 .sb-nav{padding:8px 0 20px;}
 .sb-section{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted2);padding:10px 18px 4px;}
 
 /* ── PAGE HEADER ── */
 .page-hdr{margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--border);}
-.page-hdr .eye{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
+.page-hdr .eye{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#2e7d5a;margin-bottom:8px;}
 .page-hdr h1{font-family:var(--font-d);font-size:clamp(22px,3vw,36px);font-weight:800;letter-spacing:-.02em;line-height:1.1;}
-.page-hdr h1 span{color:var(--teal);}
+.page-hdr h1 span{color:#2e7d5a;}
 .page-hdr .meta{font-size:10px;color:var(--muted);margin-top:6px;}
 
 /* ── SECTION WRAPPER ── */
 .section{margin-bottom:40px;}
-.sec-hdr{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.sec-hdr{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#5a3e28;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-weight:700;}
 .sec-hdr::after{content:'';flex:1;height:1px;background:var(--border);}
 
 /* ── STAT CARDS ── */
@@ -88,7 +109,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .kpi.k-grey::after{background:var(--muted2);}
 .kpi .kl{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
 .kpi .kv{font-family:var(--font-d);font-size:40px;font-weight:800;line-height:1;}
-.kpi.k-teal .kv{color:var(--teal);}
+.kpi.k-teal .kv{color:#2e7d5a;}
 .kpi.k-amber .kv{color:var(--amber);}
 .kpi.k-red .kv{color:var(--red);}
 .kpi.k-grey .kv{color:var(--muted2);}
@@ -97,32 +118,32 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 /* ── PANELS ── */
 .panel{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px;}
 .panel-title{font-family:var(--font-d);font-size:13px;font-weight:700;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;}
-.badge{font-family:var(--font-m);font-size:8px;letter-spacing:.08em;background:rgba(0,212,180,.1);border:1px solid rgba(0,212,180,.2);color:var(--teal);padding:3px 8px;border-radius:4px;}
+.badge{font-family:var(--font-m);font-size:8px;letter-spacing:.08em;background:rgba(232,99,42,.1);border:1px solid rgba(232,99,42,.2);color:#2e7d5a;padding:3px 8px;border-radius:4px;}
 .badge.amber{background:rgba(240,165,0,.1);border-color:rgba(240,165,0,.2);color:var(--amber);}
-.badge.red{background:rgba(255,77,109,.1);border-color:rgba(255,77,109,.2);color:var(--red);}
+.badge.red{background:rgba(176,48,48,.1);border-color:rgba(176,48,48,.15);color:var(--red);}
 
 /* ── LEASE GRID ── */
 .lease-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
 .lease-block{background:var(--s2);border-radius:10px;padding:18px;}
-.lease-block h4{font-family:var(--font-d);font-size:11px;font-weight:700;color:var(--teal);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.lease-block h4{font-family:var(--font-d);font-size:11px;font-weight:700;color:#2e7d5a;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
 .lease-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(35,43,58,.4);font-size:10px;}
 .lease-row:last-child{border-bottom:none;}
 .lease-row .lk{color:var(--muted);}
 .lease-row .lv{color:var(--text);font-weight:500;text-align:right;max-width:55%;}
-.lease-row .lv.highlight{color:var(--teal);}
+.lease-row .lv.highlight{color:#2e7d5a;}
 .lease-row .lv.amber{color:var(--amber);}
 
 /* Revenue table */
 .rev-table{width:100%;border-collapse:collapse;font-size:9px;margin-top:12px;}
-.rev-table th{background:var(--s3);color:var(--muted);padding:7px 10px;text-align:center;font-weight:500;border:1px solid var(--border);}
+.rev-table th{background:rgba(240,165,0,.1);color:var(--text);padding:7px 10px;text-align:center;font-weight:500;border:1px solid var(--border);}
 .rev-table td{padding:6px 10px;text-align:right;border:1px solid var(--border);color:var(--text);}
-.rev-table tr:nth-child(even) td{background:rgba(26,32,48,.5);}
+.rev-table tr:nth-child(even) td{background:rgba(240,165,0,.06);}
 .rev-table td:first-child{text-align:left;color:var(--muted);font-size:8px;letter-spacing:.06em;}
 
 /* ── STATUS PILLS ── */
 .pill{display:inline-flex;align-items:center;gap:4px;font-size:8px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;border:1px solid transparent;}
 .pill:hover{filter:brightness(1.2);transform:scale(1.04);}
-.pill.closed{background:rgba(0,212,180,.12);color:var(--teal);border-color:rgba(0,212,180,.25);}
+.pill.closed{background:rgba(0,212,180,.12);color:#2e7d5a;border-color:rgba(0,212,180,.25);}
 .pill.inprog{background:rgba(240,165,0,.12);color:var(--amber);border-color:rgba(240,165,0,.25);}
 .pill.open{background:rgba(61,79,110,.25);color:#8fa0cc;border-color:rgba(61,79,110,.4);}
 .pill.na{background:rgba(167,139,250,.1);color:var(--purple);border-color:rgba(167,139,250,.2);}
@@ -134,7 +155,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .acc-hdr{display:flex;align-items:center;gap:14px;padding:14px 18px;cursor:pointer;user-select:none;transition:background .15s;}
 .acc-hdr:hover{background:rgba(0,212,180,.03);}
 .acc-num{font-family:var(--font-d);font-size:18px;font-weight:800;color:rgba(0,212,180,.2);width:32px;flex-shrink:0;}
-.acc-item.open .acc-num{color:var(--teal);}
+.acc-item.open .acc-num{color:#2e7d5a;}
 .acc-info{flex:1;min-width:0;}
 .acc-name{font-family:var(--font-d);font-size:12px;font-weight:700;margin-bottom:2px;}
 .acc-meta{font-size:9px;color:var(--muted);}
@@ -143,17 +164,17 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .acc-bar-fill{height:100%;border-radius:2px;transition:width .5s ease;}
 .acc-pct{font-size:10px;font-weight:700;width:30px;text-align:right;}
 .acc-chevron{font-size:9px;color:var(--muted);transition:transform .25s;}
-.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--teal);}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:#2e7d5a;}
 .acc-body{display:none;border-top:1px solid var(--border);}
 .acc-item.open .acc-body{display:block;}
 
 /* Sub-rows */
-.sub-hdr{display:grid;gap:10px;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);padding:10px 18px 6px;border-bottom:1px solid rgba(35,43,58,.4);}
-.sub-row{display:grid;gap:10px;align-items:center;padding:8px 18px;border-bottom:1px solid rgba(35,43,58,.3);font-size:10px;transition:background .1s;}
+.sub-hdr{display:grid;gap:10px;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:8px 18px;border-bottom:1px solid var(--border);align-items:center;background:var(--s3);}
+.sub-row{display:grid;gap:10px;align-items:start;padding:9px 18px;border-bottom:1px solid var(--border);font-size:10px;transition:background .1s;}
 .sub-row:last-child{border-bottom:none;}
 .sub-row:hover{background:rgba(0,212,180,.02);}
 .sub-scope{color:var(--text);line-height:1.4;}
-.sub-muted{font-size:9px;color:var(--muted);text-align:center;}
+.sub-muted{font-size:9px;color:var(--muted);text-align:left;text-align:center;}
 
 /* 4-col sub layout */
 .grid-4{grid-template-columns:1fr 70px 110px 120px;}
@@ -183,7 +204,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 /* ── RISKS / KEY POINTS ── */
 .risk-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
 .risk-card{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:border-color .2s,transform .15s;}
-.risk-card:hover{border-color:rgba(255,77,109,.3);transform:translateY(-1px);}
+.risk-card:hover{border-color:rgba(176,48,48,.3);transform:translateY(-1px);}
 .risk-card.amber:hover{border-color:rgba(240,165,0,.3);}
 .risk-card.teal:hover{border-color:rgba(0,212,180,.3);}
 .risk-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
@@ -196,14 +217,14 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .phase-tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border);}
 .phase-tab{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:9px 16px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s;}
 .phase-tab:hover{color:var(--text);}
-.phase-tab.active{color:var(--teal);border-bottom-color:var(--teal);}
+.phase-tab.active{color:#2e7d5a;border-bottom-color:#2e7d5a;}
 .phase-pane{display:none;}
 .phase-pane.active{display:block;}
 
 /* ── FLOOR TIMELINE ── */
 .floor-row{display:grid;grid-template-columns:60px 1fr 130px 130px 100px;gap:12px;align-items:center;padding:10px 14px;background:var(--s2);border-radius:8px;border:1px solid var(--border);margin-bottom:6px;font-size:10px;transition:border-color .2s;}
 .floor-row:hover{border-color:rgba(0,212,180,.25);}
-.floor-num{font-family:var(--font-d);font-size:20px;font-weight:800;color:var(--teal);}
+.floor-num{font-family:var(--font-d);font-size:20px;font-weight:800;color:#2e7d5a;}
 .floor-rem{font-size:9px;color:var(--muted);line-height:1.4;}
 .floor-date .fd-lbl{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);margin-bottom:2px;}
 .floor-date .fd-val{font-size:10px;color:var(--text);}
@@ -226,7 +247,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 /* ── HINT ── */
 .hint-bar{display:flex;align-items:center;gap:7px;font-size:9px;color:var(--muted);margin-bottom:14px;padding:8px 12px;background:rgba(0,212,180,.04);border:1px solid rgba(0,212,180,.1);border-radius:7px;}
-.hint-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 1.8s infinite;}
+.hint-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 1.8s infinite;}
 @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
 
 /* ── MISC ── */
@@ -239,9 +260,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 /* ── UPLOAD ZONE ── */
 .upload-section{margin-top:60px;padding-top:32px;border-top:1px solid var(--border);}
 .upload-zone{border:2px dashed var(--border);border-radius:14px;padding:24px 28px;display:flex;align-items:center;gap:18px;cursor:pointer;transition:all .2s;background:var(--s1);position:relative;margin-top:16px;}
-.upload-zone:hover,.upload-zone.drag-over{border-color:var(--teal);background:rgba(0,212,180,.04);}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--orange);background:rgba(0,212,180,.04);}
 .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.upload-icon{width:44px;height:44px;border-radius:10px;background:rgba(0,212,180,.1);border:1px solid rgba(0,212,180,.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.upload-icon{width:44px;height:44px;border-radius:10px;background:rgba(232,99,42,.1);border:1px solid rgba(232,99,42,.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .upload-text .ut-main{font-family:var(--font-d);font-size:14px;font-weight:700;margin-bottom:3px;}
 .upload-text .ut-sub{font-size:10px;color:var(--muted);}
 .upload-status-bar{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:10px 16px;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:10px;}
@@ -254,7 +275,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 /* Loading overlay */
 .loading-overlay{display:none;position:fixed;inset:0;background:rgba(11,14,20,.88);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
 .loading-overlay.show{display:flex;}
-.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:#2e7d5a;border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-msg{font-size:11px;color:var(--muted);letter-spacing:.1em;}
 
@@ -275,7 +296,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .org-node-box:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.3);}
 .org-node-box.rag-closed{background:rgba(0,212,180,.12);border-color:rgba(0,212,180,.4);}
 .org-node-box.rag-wip   {background:rgba(240,165,0,.12);border-color:rgba(240,165,0,.4);}
-.org-node-box.rag-open  {background:rgba(255,77,109,.1); border-color:rgba(255,77,109,.35);}
+.org-node-box.rag-open  {background:rgba(176,48,48,.1); border-color:rgba(176,48,48,.3);}
 .org-node-box.rag-na    {background:var(--s2);           border-color:var(--border);}
 .org-role-name{font-size:9px;font-weight:700;color:var(--text);line-height:1.3;}
 .org-role-hc{font-size:8px;color:var(--muted);margin-top:2px;}
@@ -301,13 +322,13 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .floor-tile-scope{font-size:9px;color:var(--muted);line-height:1.4;padding-right:12px;}
 .floor-tile-date{font-size:10px;color:var(--text);}
 .floor-tile-date-lbl{font-size:8px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1px;}
-.floor-tile-chevron{text-align:center;font-size:10px;color:var(--teal);transition:transform .2s;opacity:.5;}
+.floor-tile-chevron{text-align:center;font-size:10px;color:#2e7d5a;transition:transform .2s;opacity:.5;}
 .floor-tile.open .floor-tile-chevron{transform:rotate(180deg);opacity:1;}
 .floor-tile-body{display:none;padding:0 20px 14px 20px;}
 .floor-tile.open .floor-tile-body{display:block;}
 .floor-open-item{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:8px 12px;background:var(--s2);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:7px;margin-bottom:6px;}
 .floor-open-item:last-child{margin-bottom:0;}
-.floor-open-item.done{border-left-color:var(--teal);opacity:.65;}
+.floor-open-item.done{border-left-color:#2e7d5a;opacity:.65;}
 .foi-desc{font-size:9px;color:var(--text);line-height:1.4;}
 .foi-due{font-size:8px;color:var(--muted2);white-space:nowrap;}
 .floor-no-items{font-size:9px;color:var(--muted);padding:8px 0;font-style:italic;}
@@ -318,7 +339,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   display:block;text-decoration:none;color:inherit;
 }
 .kpi-nav-tile:hover{
-  border-color:var(--teal);
+  border-color:#2e7d5a;
   background:rgba(0,212,180,.03);
   box-shadow:0 0 0 1px rgba(0,212,180,.3);
 }
@@ -326,7 +347,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .knt-header{display:flex;align-items:center;gap:9px;margin-bottom:0;}
 .knt-icon{font-size:15px;}
 .knt-title{font-family:var(--font-d);font-size:12px;font-weight:700;color:var(--text);flex:1;}
-.knt-arrow{font-size:13px;color:var(--teal);opacity:.4;transition:opacity .15s;}
+.knt-arrow{font-size:13px;color:#2e7d5a;opacity:.4;transition:opacity .15s;}
 
 /* Phase bars inside tile */
 .knt-phase-bars{display:flex;flex-direction:column;gap:5px;margin-top:12px;}
@@ -358,7 +379,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .chk-track{height:6px;background:var(--s2);border-radius:3px;overflow:hidden;position:relative;}
 .chk-fill{height:100%;border-radius:3px;background:var(--amber);}
 .chk-num{font-size:9px;font-weight:700;color:var(--amber);text-align:right;}
-.chat-fab{position:fixed;bottom:28px;right:28px;width:52px;height:52px;border-radius:50%;background:var(--teal);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 24px rgba(0,212,180,.4);transition:all .2s;z-index:500;}
+.chat-fab{position:fixed;bottom:28px;right:28px;width:52px;height:52px;border-radius:50%;background:var(--orange);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 24px rgba(0,212,180,.4);transition:all .2s;z-index:500;}
 .chat-fab:hover{transform:scale(1.1);box-shadow:0 6px 32px rgba(0,212,180,.55);}
 .chat-fab .chat-fab-badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--amber);font-size:8px;font-weight:700;color:#000;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);}
 
@@ -368,7 +389,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .chat-hdr{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .chat-hdr-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#0098a0);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
 .chat-hdr-info .chat-name{font-family:var(--font-d);font-size:12px;font-weight:700;color:var(--text);}
-.chat-hdr-info .chat-status{font-size:9px;color:var(--teal);display:flex;align-items:center;gap:4px;}
+.chat-hdr-info .chat-status{font-size:9px;color:#2e7d5a;display:flex;align-items:center;gap:4px;}
 .chat-hdr-info .chat-status::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--teal);display:inline-block;}
 .chat-close{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;transition:all .15s;}
 .chat-close:hover{color:var(--text);background:var(--s2);}
@@ -397,11 +418,11 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 .chat-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px;border-top:1px solid var(--border);flex-shrink:0;}
 .chat-suggestion{font-size:9px;padding:4px 9px;border-radius:12px;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:var(--s2);transition:all .15s;white-space:nowrap;}
-.chat-suggestion:hover{border-color:var(--teal);color:var(--teal);background:rgba(0,212,180,.08);}
+.chat-suggestion:hover{border-color:#2e7d5a;color:#2e7d5a;background:rgba(0,212,180,.08);}
 
 .chat-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0;}
 .chat-input{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-m);font-size:10px;padding:8px 12px;outline:none;resize:none;transition:border-color .15s;min-height:36px;max-height:80px;}
-.chat-input:focus{border-color:var(--teal);}
+.chat-input:focus{border-color:#2e7d5a;}
 .chat-input::placeholder{color:var(--muted2);}
 .chat-send{background:var(--teal);border:none;border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s;}
 .chat-send:hover{background:#00f0cc;}
@@ -671,7 +692,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .sec-filter-label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);flex-shrink:0;}
 .sec-filter-sel{background:var(--s1);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 8px;font-size:9px;font-family:var(--font-m);outline:none;cursor:pointer;}
 .sec-filter-clear{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:4px 10px;font-size:9px;font-family:var(--font-m);cursor:pointer;transition:all .15s;}
-.sec-filter-clear:hover{border-color:var(--teal);color:var(--teal);}
+.sec-filter-clear:hover{border-color:#2e7d5a;color:#2e7d5a;}
 .sec-filter-count{font-size:9px;color:var(--muted);margin-left:auto;}
 html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
 </style>
@@ -684,7 +705,16 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
 <div class="mob-overlay" id="mob-overlay" onclick="toggleMobSidebar()"></div>
 
 <!-- ══ SIDEBAR — outside all wrappers, pure fixed positioning ══ -->
+<div id="sb-reopen-tab" onclick="toggleSidebar()" title="Open menu"
+  style="display:none;position:fixed;top:50%;left:0;transform:translateY(-50%);z-index:699;
+         background:var(--orange);border-radius:0 8px 8px 0;padding:14px 7px;cursor:pointer;
+         writing-mode:vertical-rl;font-size:9px;font-weight:700;letter-spacing:.12em;
+         text-transform:uppercase;color:#fff;user-select:none;box-shadow:2px 0 8px rgba(0,0,0,.15);">☰ Menu</div>
 <nav class="sidebar">
+  <div class="sidebar-toggle-btn" id="sb-toggle-btn" onclick="toggleSidebar()" title="Toggle sidebar">
+    <span style="font-weight:600;font-size:9px;letter-spacing:.08em;text-transform:uppercase;">Navigation</span>
+    <span class="sidebar-toggle-icon" id="sb-toggle-icon">◀</span>
+  </div>
   <div class="sb-logo">
     <div class="proj">JPMC · ODC Mumbai</div>
     <div class="name">Handover Dashboard</div>
@@ -696,32 +726,35 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
     <div class="lcd-days" id="lcd-days-sb">⚡ 13 days remaining</div>
   </div>
   <div class="theme-btn" onclick="toggleTheme()">
-    <span class="theme-btn-icon" id="theme-icon">☀️</span>
-    <span class="theme-btn-label" id="theme-label">Light Mode</span>
+    <span class="theme-btn-icon" id="theme-icon">🌙</span>
+    <span class="theme-btn-label" id="theme-label">Dark Mode</span>
     <div class="theme-btn-track"><div class="theme-btn-thumb"></div></div>
   </div>
   <div class="sb-nav">
     <div class="sb-section">Overview</div>
     <a class="sb-link active" href="#lease"><span class="sb-icon">📋</span>Lease & Commercials</a>
-    <a class="sb-link" href="#kpis"><span class="sb-icon">📊</span>Project KPIs</a>
+    <a class="sb-link" href="#kpis" onclick="event.preventDefault();navToSection('kpis')"><span class="sb-icon">📊</span>Project KPIs</a>
     <div class="sb-section">Handover</div>
-    <a class="sb-link" href="#hoto-tc"><span class="sb-icon">⚡</span>T&amp;C Tracker</a>
-    <a class="sb-link" href="#hoto-project"><span class="sb-icon">🏗</span>Floor Handover</a>
-    <a class="sb-link" href="#hoto-checklist"><span class="sb-icon">✅</span>Handover Checklist</a>
-    <a class="sb-link" href="#hoto-bb"><span class="sb-icon">🏢</span>Base Build</a>
-    <a class="sb-link" href="#other-activities"><span class="sb-icon">📋</span>Other Activities</a>
-    <a class="sb-link" href="#hiring"><span class="sb-icon">👥</span>Hiring Status</a>
-    <a class="sb-link" href="#hoto-snag"><span class="sb-icon">🔍</span>Snag Tracker</a>
-    <a class="sb-link" href="#ws-tracker"><span class="sb-icon">🎯</span>Workstream Tracker</a>
+    <a class="sb-link" href="#hoto-tc" onclick="event.preventDefault();navToSection('hoto-tc')"><span class="sb-icon">⚡</span>T&amp;C Tracker</a>
+    <a class="sb-link" href="#hoto-project" onclick="event.preventDefault();navToSection('hoto-project')"><span class="sb-icon">🏗</span>Floor Handover</a>
+    <a class="sb-link" href="#hoto-checklist" onclick="event.preventDefault();navToSection('hoto-checklist')"><span class="sb-icon">✅</span>Handover Checklist</a>
+    <a class="sb-link" href="#hoto-bb" onclick="event.preventDefault();navToSection('hoto-bb')"><span class="sb-icon">🏢</span>Base Build</a>
+    <a class="sb-link" href="#other-activities" onclick="event.preventDefault();navToSection('other-activities')"><span class="sb-icon">📋</span>Other Activities</a>
+    <a class="sb-link" href="#hiring" onclick="event.preventDefault();navToSection('hiring')"><span class="sb-icon">👥</span>Hiring Status</a>
+    <a class="sb-link" href="#hoto-snag" onclick="event.preventDefault();navToSection('hoto-snag')"><span class="sb-icon">🔍</span>Snag Tracker</a>
+    <a class="sb-link" href="#ws-tracker" onclick="event.preventDefault();navToSection('ws-tracker')"><span class="sb-icon">🎯</span>Workstream Tracker</a>
     <div class="sb-section">Risks &amp; Questions</div>
-    <a class="sb-link" href="#risks"><span class="sb-icon">⚠</span>Key Risks</a>
-    <a class="sb-link" href="#questions"><span class="sb-icon">❓</span>Open Questions</a>
-    <a class="sb-link" href="#critical-tasks"><span class="sb-icon">🚨</span>Critical Tasks</a>
+    <a class="sb-link" href="#risks" onclick="event.preventDefault();navToSection('risks')"><span class="sb-icon">⚠</span>Key Risks</a>
+    <a class="sb-link" href="#questions" onclick="event.preventDefault();navToSection('questions')"><span class="sb-icon">❓</span>Open Questions</a>
+    <a class="sb-link" href="#critical-tasks" onclick="event.preventDefault();navToSection('critical-tasks')"><span class="sb-icon">🚨</span>Critical Tasks</a>
     <div class="sb-section">Data</div>
-    <a class="sb-link" href="#upload-section"><span class="sb-icon">📂</span>Upload Excel</a>
+    <a class="sb-link" href="#upload-section" onclick="event.preventDefault();navToSection('upload-section')"><span class="sb-icon">📂</span>Upload Excel</a>
     <div class="sb-section">Overdue</div>
+    <div class="sb-link" onclick="toggleOpenFilter()" style="cursor:pointer;" id="sb-open-filter">
+      <span class="sb-icon">🔴</span>Open Items Only <span id="sb-open-badge" style="margin-left:auto;font-size:8px;padding:1px 6px;border-radius:8px;background:rgba(176,48,48,.15);color:#b03030;display:none;"></span>
+    </div>
     <div class="sb-link" onclick="toggleOverduePanel()" style="cursor:pointer;" id="sb-overdue-link">
-      <span class="sb-icon">⚠</span>Overdue Tasks <span id="sb-overdue-count" style="margin-left:auto;font-size:8px;padding:1px 6px;border-radius:8px;background:rgba(255,77,109,.2);color:#ff4d6d;"></span>
+      <span class="sb-icon">⚠</span>Overdue Tasks <span id="sb-overdue-count" style="margin-left:auto;font-size:8px;padding:1px 6px;border-radius:8px;background:rgba(176,48,48,.15);color:#b03030;"></span>
     </div>
     <div class="sb-section">Export</div>
     <div class="sb-link" onclick="exportPDF()" style="cursor:pointer;">
@@ -765,7 +798,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
       <div class="lease-row"><span class="lk">Scheduled Handover / LCD</span><span class="lv highlight">01 April 2026</span></div>
       <div class="lease-row"><span class="lk">License Term</span><span class="lv">60 months (5 years)</span></div>
       <div class="lease-row"><span class="lk">Renewal Term</span><span class="lv">60 months</span></div>
-      <div class="lease-row"><span class="lk">Lock-in Period</span><span class="lv" style="color:#ffffff;font-weight:700;">36 months (till 31 Mar 2029)</span></div>
+      <div class="lease-row"><span class="lk">Lock-in Period</span><span class="lv" style="font-weight:700;">36 months (till 31 Mar 2029)</span></div>
       <div class="lease-row"><span class="lk">Term End</span><span class="lv">31 March 2031</span></div>
       <div class="lease-row"><span class="lk">Escalation</span><span class="lv">5% every 12 months</span></div>
       <div class="lease-row"><span class="lk">Early Access Since</span><span class="lv">December 2025 (utilities only)</span></div>
@@ -849,14 +882,14 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
     </div>
 
     <!-- Tile 2: High Risks — clickable → risks section -->
-    <div class="kpi k-red" style="padding:20px;cursor:pointer;display:flex;flex-direction:column;overflow:visible;" onclick="navToSection('risks')">
+    <div class="kpi k-red" style="padding:20px;cursor:pointer;display:flex;flex-direction:column;overflow:visible;" onclick=\"navToSection('risks')\">
       <div class="kl">High Priority Risks</div>
       <div class="kv" style="font-size:42px;line-height:1;" id="kv-high-risks">5</div>
       <div style="margin-top:8px;display:flex;flex-direction:column;gap:3px;max-height:120px;overflow-y:auto;padding-right:2px;" id="risk-preview-list"></div>
     </div>
 
     <!-- Tile 3: Floors Handed Over -->
-    <div class="kpi k-amber" style="padding:20px;cursor:pointer;" onclick="navToSection('hoto-project')">
+    <div class="kpi k-amber" style="padding:20px;cursor:pointer;" onclick=\"navToSection('hoto-project')\">
       <div class="kl">Floors Handed Over</div>
       <div class="kv" style="font-size:42px;line-height:1;" id="kv-floors-done">2<span style="font-size:18px;color:var(--muted)">/7</span></div>
       <div class="ks" id="ks-floors">6F &amp; 7F done · 5 floors pending</div>
@@ -866,15 +899,15 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
 
   <!-- ── PROGRESS BANNER: 6 mini donuts ── -->
   <div class="panel" style="padding:18px 24px;margin-bottom:20px;background:var(--s2);">
-    <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:14px;">Overall Progress — Live Status</div>
+    <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#2e7d5a;margin-bottom:14px;">Overall Progress — Live Status</div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;" id="progress-banner"></div>
   </div>
 
   <!-- ── ROW 2: T&C | Handover Checklist ── -->
-  <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;display:flex;align-items:center;gap:10px;">Testing, Commissioning &amp; Handover <span style="flex:1;height:1px;background:var(--border);display:block;"></span></div>
+  <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:12px;display:flex;align-items:center;gap:10px;">Testing, Commissioning &amp; Handover <span style="flex:1;height:1px;background:var(--border);display:block;"></span></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
 
-    <a href="#hoto-tc" class="kpi-nav-tile">
+    <a href="#hoto-tc" class="kpi-nav-tile" onclick="event.preventDefault();navToSection('hoto-tc');">
       <div class="knt-header">
         <span class="knt-icon">⚡</span>
         <span class="knt-title">Testing &amp; Commissioning</span>
@@ -883,7 +916,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
       <div id="kpi-tc-visual" style="margin-top:10px;"></div>
     </a>
 
-    <a href="#hoto-project" class="kpi-nav-tile">
+    <a href="#hoto-project" class="kpi-nav-tile" onclick="event.preventDefault();navToSection('hoto-project');">
       <div class="knt-header">
         <span class="knt-icon">🏗</span>
         <span class="knt-title">Handover Checklist</span>
@@ -895,10 +928,10 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   </div>
 
   <!-- ── ROW 3: Base Build | Other Activities ── -->
-  <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;display:flex;align-items:center;gap:10px;">Base Build &amp; Activities <span style="flex:1;height:1px;background:var(--border);display:block;"></span></div>
+  <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:12px;display:flex;align-items:center;gap:10px;">Base Build &amp; Activities <span style="flex:1;height:1px;background:var(--border);display:block;"></span></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;align-items:stretch;">
 
-    <a href="#hoto-bb" class="kpi-nav-tile" style="display:flex;flex-direction:column;">
+    <a href="#hoto-bb" class="kpi-nav-tile" style="display:flex;flex-direction:column;" onclick="event.preventDefault();navToSection('hoto-bb');">
       <div class="knt-header">
         <span class="knt-icon">🏢</span>
         <span class="knt-title">Base Build Tracker</span>
@@ -907,7 +940,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
       <div id="kpi-bb-visual" style="margin-top:10px;flex:1;"></div>
     </a>
 
-    <a href="#other-activities" class="kpi-nav-tile" style="display:flex;flex-direction:column;" onclick="event.preventDefault();navToSection('other-activities');">
+    <a href="#other-activities" class="kpi-nav-tile" style="display:flex;flex-direction:column;" onclick=\"event.preventDefault();navToSection('other-activities');\" onclick="event.preventDefault();navToSection('other-activities');">
       <div class="knt-header">
         <span class="knt-icon">📋</span>
         <span class="knt-title">Other Activities</span>
@@ -919,7 +952,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   </div>
 
   <!-- ── ROW 3b: JPMC Workstreams — full width ── -->
-  <a href="#other-activities" class="kpi-nav-tile" style="display:flex;flex-direction:column;margin-bottom:20px;" onclick="event.preventDefault();navToSection('other-activities');">
+  <a href="#other-activities" class="kpi-nav-tile" style="display:flex;flex-direction:column;margin-bottom:20px;" onclick=\"event.preventDefault();navToSection('other-activities');\" onclick="event.preventDefault();navToSection('other-activities');">
     <div class="knt-header">
       <span class="knt-icon">🎯</span>
       <span class="knt-title">JPMC Workstreams</span>
@@ -929,10 +962,10 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   </a>
 
   <!-- ── ROW 4: Hiring | Snag ── -->
-  <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;display:flex;align-items:center;gap:10px;">Hiring &amp; Snags <span style="flex:1;height:1px;background:var(--border);display:block;"></span></div>
+  <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:12px;display:flex;align-items:center;gap:10px;">Hiring &amp; Snags <span style="flex:1;height:1px;background:var(--border);display:block;"></span></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;align-items:stretch;">
 
-    <a href="#hiring" class="kpi-nav-tile" style="display:flex;flex-direction:column;">
+    <a href="#hiring" class="kpi-nav-tile" style="display:flex;flex-direction:column;" onclick="event.preventDefault();navToSection('hiring');">
       <div class="knt-header">
         <span class="knt-icon">👥</span>
         <span class="knt-title">Hiring Status</span>
@@ -943,7 +976,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
       <div id="hiring-pes-kpi"></div>
     </a>
 
-    <a href="#hoto-snag" class="kpi-nav-tile" style="display:flex;flex-direction:column;">
+    <a href="#hoto-snag" class="kpi-nav-tile" style="display:flex;flex-direction:column;" onclick="event.preventDefault();navToSection('hoto-snag');">
       <div class="knt-header">
         <span class="knt-icon">🔍</span>
         <span class="knt-title">Snag Summary</span>
@@ -964,7 +997,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   <div class="sec-hdr sec-toggle" onclick="toggleSection('hoto-tc')" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;margin-bottom:0;">
     <span style="font-size:13px;">⚡</span>
     <span style="flex:1;">Testing & Commissioning</span>
-    <span class="sec-chevron" id="chev-hoto-tc" style="font-size:10px;color:var(--teal);transition:transform .2s;transform:rotate(0deg);">▼</span>
+    <span class="sec-chevron" id="chev-hoto-tc" style="font-size:10px;color:var(--orange);transition:transform .2s;transform:rotate(0deg);">▼</span>
   </div>
   <div class="sec-body" id="body-hoto-tc" style="margin-top:16px;">
     <div class="sec-filter-bar" id="fbar-tc">
@@ -972,7 +1005,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
       <select id="ftc-sys" onchange="filterTC()" class="sec-filter-sel"><option value="">All Systems</option></select>
       <select id="ftc-status" onchange="filterTC()" class="sec-filter-sel"><option value="">All Statuses</option><option>Open</option><option>In Progress</option><option>Closed</option></select>
       <button onclick="clearFilter('tc')" class="sec-filter-clear">✕ Clear</button>
-      <button onclick="filterOverdueOnly('tc')" class="sec-filter-clear" style="border-color:rgba(255,77,109,.4);color:#ff4d6d;">⚠ Overdue</button>
+      <button onclick="filterOverdueOnly('tc')" class="sec-filter-clear" style="border-color:rgba(255,77,109,.4);color:#b03030;">⚠ Overdue</button>
       <span id="fcount-tc" class="sec-filter-count"></span>
     </div>
     <div id="tc-acc"></div>
@@ -983,7 +1016,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   <div class="sec-hdr sec-toggle" onclick="toggleSection('hoto-project')" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;margin-bottom:0;">
     <span style="font-size:13px;">🏗</span>
     <span style="flex:1;">Floor-by-Floor Handover</span>
-    <span class="sec-chevron" id="chev-hoto-project" style="font-size:10px;color:var(--teal);transition:transform .2s;transform:rotate(0deg);">▼</span>
+    <span class="sec-chevron" id="chev-hoto-project" style="font-size:10px;color:var(--orange);transition:transform .2s;transform:rotate(0deg);">▼</span>
   </div>
   <div class="sec-body" id="body-hoto-project" style="margin-top:16px;">
     <div class="sec-filter-bar" id="fbar-fl">
@@ -1050,7 +1083,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   <div class="sec-hdr sec-toggle" onclick="toggleSection('hoto-checklist')" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;margin-bottom:0;">
     <span style="font-size:13px;">✅</span>
     <span style="flex:1;">Handover Checklist</span>
-    <span class="sec-chevron" id="chev-hoto-checklist" style="font-size:10px;color:var(--teal);transition:transform .2s;transform:rotate(0deg);">▼</span>
+    <span class="sec-chevron" id="chev-hoto-checklist" style="font-size:10px;color:var(--orange);transition:transform .2s;transform:rotate(0deg);">▼</span>
   </div>
   <div class="sec-body" id="body-hoto-checklist" style="margin-top:16px;">
     <div class="sec-filter-bar" id="fbar-hc">
@@ -1069,7 +1102,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   <div class="sec-hdr sec-toggle" onclick="toggleSection('hoto-bb')" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;margin-bottom:0;">
     <span style="font-size:13px;">🏢</span>
     <span style="flex:1;">Base Build Tracker</span>
-    <span class="sec-chevron" id="chev-hoto-bb" style="font-size:10px;color:var(--teal);transition:transform .2s;transform:rotate(0deg);">▼</span>
+    <span class="sec-chevron" id="chev-hoto-bb" style="font-size:10px;color:var(--orange);transition:transform .2s;transform:rotate(0deg);">▼</span>
   </div>
   <div class="sec-body" id="body-hoto-bb" style="margin-top:16px;">
     <div class="sec-filter-bar" id="fbar-bb">
@@ -1078,7 +1111,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
       <select id="fbb-crit" onchange="filterBB()" class="sec-filter-sel"><option value="">All Priority</option><option value="Y">Critical Only</option></select>
       <select id="fbb-status" onchange="filterBB()" class="sec-filter-sel"><option value="">All Statuses</option><option>Open</option><option>In Progress</option><option>Closed</option></select>
       <button onclick="clearFilter('bb')" class="sec-filter-clear">✕ Clear</button>
-      <button onclick="filterOverdueOnly('bb')" class="sec-filter-clear" style="border-color:rgba(255,77,109,.4);color:#ff4d6d;">⚠ Overdue</button>
+      <button onclick="filterOverdueOnly('bb')" class="sec-filter-clear" style="border-color:rgba(255,77,109,.4);color:#b03030;">⚠ Overdue</button>
       <span id="fcount-bb" class="sec-filter-count"></span>
     </div>
     <div class="hint-bar"><span class="hint-dot"></span><span id="bb-hint-text">All 61 base build checklist items grouped by category. Go-Live Critical items flagged in red.</span></div>
@@ -1090,7 +1123,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   <div class="sec-hdr sec-toggle" onclick="toggleSection('other-activities')" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;margin-bottom:0;">
     <span style="font-size:13px;">📋</span>
     <span style="flex:1;">Other Activities</span>
-    <span class="sec-chevron" id="chev-other-activities" style="font-size:10px;color:var(--teal);transition:transform .2s;transform:rotate(0deg);">▼</span>
+    <span class="sec-chevron" id="chev-other-activities" style="font-size:10px;color:var(--orange);transition:transform .2s;transform:rotate(0deg);">▼</span>
   </div>
   <div class="sec-body" id="body-other-activities" style="margin-top:16px;">
     <div class="sec-filter-bar" id="fbar-oa">
@@ -1099,25 +1132,14 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
       <select id="foa-sub" onchange="filterOA()" class="sec-filter-sel"><option value="">All Sub-categories</option></select>
       <select id="foa-status" onchange="filterOA()" class="sec-filter-sel"><option value="">All Statuses</option><option>Open</option><option>In Progress</option><option>Closed</option></select>
       <button onclick="clearFilter('oa')" class="sec-filter-clear">✕ Clear</button>
-      <button onclick="filterOverdueOnly('oa')" class="sec-filter-clear" style="border-color:rgba(255,77,109,.4);color:#ff4d6d;">⚠ Overdue</button>
+      <button onclick="filterOverdueOnly('oa')" class="sec-filter-clear" style="border-color:rgba(255,77,109,.4);color:#b03030;">⚠ Overdue</button>
       <span id="fcount-oa" class="sec-filter-count"></span>
     </div>
-    <!-- JPMC Workstream Track panel -->
-    <div style="margin-bottom:20px;">
-      <div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
-        JPMC Workstream Track <span style="flex:1;height:1px;background:var(--border);"></span>
-        <span id="oa-jpmc-count" style="font-size:9px;color:var(--muted);"></span>
-      </div>
-      <div id="oa-jpmc-acc"></div>
-    </div>
-    <!-- Others panel -->
-    <div>
-      <div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
-        Others <span style="flex:1;height:1px;background:var(--border);"></span>
-        <span id="oa-others-count" style="font-size:9px;color:var(--muted);"></span>
-      </div>
-      <div id="oa-others-acc"></div>
-    </div>
+    <!-- Activities accordion — populated by renderOtherActivitiesAccordion() -->
+    <div id="oa-main-acc"></div>
+    <!-- Legacy containers kept for backward compatibility -->
+    <div id="oa-jpmc-acc" style="display:none;"></div>
+    <div id="oa-others-acc" style="display:none;"></div>
   </div>
 </div>
 
@@ -1125,7 +1147,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   <div class="sec-hdr sec-toggle" onclick="toggleSection('hiring')" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;margin-bottom:0;">
     <span style="font-size:13px;">👥</span>
     <span style="flex:1;">Hiring & Resource Deployment</span>
-    <span class="sec-chevron" id="chev-hiring" style="font-size:10px;color:var(--teal);transition:transform .2s;transform:rotate(0deg);">▼</span>
+    <span class="sec-chevron" id="chev-hiring" style="font-size:10px;color:var(--orange);transition:transform .2s;transform:rotate(0deg);">▼</span>
   </div>
   <div class="sec-body" id="body-hiring" style="margin-top:16px;">
     <div class="sec-filter-bar" id="fbar-hr">
@@ -1137,7 +1159,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
     </div>
 
     <!-- ── ROW 1: Status summary tiles ── -->
-    <div id="hire-status-strip" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;"></div>
+    <div id="hire-status-strip" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;text-align:center;"></div>
 
     <!-- ── ROW 2: Ramp chart + PES panel ── -->
     <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;margin-bottom:20px;">
@@ -1172,13 +1194,13 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
           <div style="font-size:9px;color:var(--muted);margin-top:2px;">Based on org chart shared with JPMC · Click any role for detail</div>
         </div>
         <div style="display:flex;gap:12px;align-items:center;">
-          <span style="font-size:8px;display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:50%;background:#00d4b4;display:inline-block;"></span>Closed</span>
+          <span style="font-size:8px;display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:50%;background:#2e7d5a;display:inline-block;"></span>Closed</span>
           <span style="font-size:8px;display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:50%;background:#f0a500;display:inline-block;"></span>In Progress</span>
-          <span style="font-size:8px;display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:50%;background:#ff4d6d;display:inline-block;"></span>Open</span>
+          <span style="font-size:8px;display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:50%;background:#b03030;display:inline-block;"></span>Open</span>
         </div>
       </div>
       <div style="display:flex;border-bottom:1px solid var(--border);background:var(--s2);">
-        <div id="org-tab-community" onclick="switchOrgTab('community')" style="padding:10px 24px;font-size:10px;font-weight:600;cursor:pointer;border-bottom:2px solid var(--teal);color:var(--teal);">Community Team</div>
+        <div id="org-tab-community" onclick="switchOrgTab('community')" style="padding:10px 24px;font-size:10px;font-weight:600;cursor:pointer;border-bottom:2px solid var(--teal);color:#2e7d5a;">Community Team</div>
         <div id="org-tab-ops" onclick="switchOrgTab('ops')" style="padding:10px 24px;font-size:10px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);">Operations Team</div>
       </div>
       <div style="padding:20px 24px;overflow-x:auto;">
@@ -1206,7 +1228,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   <div class="sec-hdr sec-toggle" onclick="toggleSection('hoto-snag')" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;margin-bottom:0;">
     <span style="font-size:13px;">🔍</span>
     <span style="flex:1;">Snag Tracker</span>
-    <span class="sec-chevron" id="chev-hoto-snag" style="font-size:10px;color:var(--teal);transition:transform .2s;transform:rotate(0deg);">▼</span>
+    <span class="sec-chevron" id="chev-hoto-snag" style="font-size:10px;color:var(--orange);transition:transform .2s;transform:rotate(0deg);">▼</span>
   </div>
   <div class="sec-body" id="body-hoto-snag" style="margin-top:16px;">
     <div class="panel">
@@ -1246,8 +1268,8 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
           <div style="position:relative;width:100px;height:100px;margin-bottom:12px;">
             <svg width="100" height="100" viewBox="0 0 100 100" style="transform:rotate(-90deg)">
               <circle cx="50" cy="50" r="38" fill="none" stroke="#1a2030" stroke-width="13"/>
-              <circle id="snag-donut-open"   cx="50" cy="50" r="38" fill="none" stroke="#ff4d6d" stroke-width="13" stroke-dasharray="0 239" stroke-dashoffset="0"/>
-              <circle id="snag-donut-closed" cx="50" cy="50" r="38" fill="none" stroke="#00d4b4" stroke-width="13" stroke-dasharray="0 239" stroke-dashoffset="0"/>
+              <circle id="snag-donut-open"   cx="50" cy="50" r="38" fill="none" stroke="#b03030" stroke-width="13" stroke-dasharray="0 239" stroke-dashoffset="0"/>
+              <circle id="snag-donut-closed" cx="50" cy="50" r="38" fill="none" stroke="#2e7d5a" stroke-width="13" stroke-dasharray="0 239" stroke-dashoffset="0"/>
               <circle id="snag-donut-rnp"    cx="50" cy="50" r="38" fill="none" stroke="#a78bfa" stroke-width="13" stroke-dasharray="0 239" stroke-dashoffset="0"/>
             </svg>
             <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
@@ -1258,7 +1280,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
           <div style="width:100%;display:flex;flex-direction:column;gap:5px;">
             <div style="display:flex;justify-content:space-between;font-size:9px;align-items:center;">
               <span style="display:flex;align-items:center;gap:5px;color:var(--muted);"><span style="width:7px;height:7px;border-radius:1px;background:var(--teal);display:inline-block;"></span>Closed</span>
-              <span id="snag-leg-closed" style="color:var(--teal);font-weight:700;">—</span>
+              <span id="snag-leg-closed" style="color:#2e7d5a;font-weight:700;">—</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:9px;align-items:center;">
               <span style="display:flex;align-items:center;gap:5px;color:var(--muted);"><span style="width:7px;height:7px;border-radius:1px;background:var(--red);display:inline-block;"></span>Open</span>
@@ -1334,7 +1356,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   <div class="sec-hdr sec-toggle" onclick="toggleSection('ws-tracker')" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;margin-bottom:0;">
     <span style="font-size:13px;">🎯</span>
     <span style="flex:1;">Workstream Tracker</span>
-    <span class="sec-chevron" id="chev-ws-tracker" style="font-size:10px;color:var(--teal);transition:transform .2s;transform:rotate(0deg);">▼</span>
+    <span class="sec-chevron" id="chev-ws-tracker" style="font-size:10px;color:var(--orange);transition:transform .2s;transform:rotate(0deg);">▼</span>
   </div>
   <div class="sec-body" id="body-ws-tracker" style="margin-top:16px;">
     <!-- Filter bar -->
@@ -1350,7 +1372,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
         <option value="">All Leads</option>
       </select>
       <button onclick="clearFilter('ws')" class="sec-filter-clear">✕ Clear</button>
-      <button onclick="filterWSOverdue()" class="sec-filter-clear" style="border-color:rgba(255,77,109,.4);color:#ff4d6d;">⚠ Overdue</button>
+      <button onclick="filterWSOverdue()" class="sec-filter-clear" style="border-color:rgba(255,77,109,.4);color:#b03030;">⚠ Overdue</button>
       <span id="fcount-ws" class="sec-filter-count"></span>
     </div>
     <!-- Summary strip -->
@@ -1364,7 +1386,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   <div class="sec-hdr sec-toggle" onclick="toggleSection('risks')" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;margin-bottom:0;">
     <span style="font-size:13px;">⚠</span>
     <span style="flex:1;">Key Risks</span>
-    <span class="sec-chevron" id="chev-risks" style="font-size:10px;color:var(--teal);transition:transform .2s;transform:rotate(0deg);">▼</span>
+    <span class="sec-chevron" id="chev-risks" style="font-size:10px;color:var(--orange);transition:transform .2s;transform:rotate(0deg);">▼</span>
   </div>
   <div class="sec-body" id="body-risks" style="margin-top:16px;">
     <div class="sec-filter-bar" id="fbar-ri">
@@ -1382,7 +1404,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   <div class="sec-hdr sec-toggle" onclick="toggleSection('questions')" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;margin-bottom:0;">
     <span style="font-size:13px;">❓</span>
     <span style="flex:1;">Open Questions</span>
-    <span class="sec-chevron" id="chev-questions" style="font-size:10px;color:var(--teal);transition:transform .2s;transform:rotate(0deg);">▼</span>
+    <span class="sec-chevron" id="chev-questions" style="font-size:10px;color:var(--orange);transition:transform .2s;transform:rotate(0deg);">▼</span>
   </div>
   <div class="sec-body" id="body-questions" style="margin-top:16px;">
     <div class="sec-filter-bar" id="fbar-q">
@@ -1400,7 +1422,7 @@ html.light .sec-filter-sel{background:var(--s2);border-color:var(--border2);}
   <div class="sec-hdr sec-toggle" onclick="toggleSection('critical-tasks')" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;margin-bottom:0;">
     <span style="font-size:13px;">🚨</span>
     <span style="flex:1;">Critical Tasks</span>
-    <span class="sec-chevron" id="chev-critical-tasks" style="font-size:10px;color:var(--teal);transition:transform .2s;transform:rotate(0deg);">▼</span>
+    <span class="sec-chevron" id="chev-critical-tasks" style="font-size:10px;color:var(--orange);transition:transform .2s;transform:rotate(0deg);">▼</span>
   </div>
   <div class="sec-body" id="body-critical-tasks" style="margin-top:16px;">
     <div class="sec-filter-bar" id="fbar-ct">
@@ -2170,7 +2192,7 @@ let QUESTIONS = {
 // HELPERS
 // ══════════════════════════════════════════════════
 const STATUS_CYCLE = ["Open","In Progress","Closed"];
-const STATUS_COLORS = {Closed:"#00d4b4","In Progress":"#f0a500",Open:"#3d4f6e"};
+const STATUS_COLORS = {Closed:"#2e7d5a","In Progress":"#f0a500",Open:"#3d4f6e"};
 
 function pillClass(s){
   if(s==="Closed") return "closed";
@@ -2184,10 +2206,10 @@ function pillLabel(s){
   return "○ Open";
 }
 function nextStatus(s){ return STATUS_CYCLE[(STATUS_CYCLE.indexOf(s)+1)%STATUS_CYCLE.length]; }
-function barColor(p){ return p>=0.6?"#00d4b4":p>0?"#f0a500":"#232b3a"; }
+function barColor(p){ return p>=0.6?"#2e7d5a":p>0?"#f0a500":"#232b3a"; }
 
 let toastT;
-function showToast(msg,col="#00d4b4"){
+function showToast(msg,col="#2e7d5a"){
   const t=document.getElementById("toast"),d=document.getElementById("toast-dot"),m=document.getElementById("toast-msg");
   d.style.background=col; m.textContent=msg; t.classList.add("show");
   clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1800);
@@ -2392,8 +2414,8 @@ function updateSnagSummary(){
   const rnp=statusSelects.filter(s=>s.value==="RNP").length;
   wrap.innerHTML=`
     <span style="font-size:9px;background:rgba(61,79,110,.3);color:#8fa0cc;border:1px solid rgba(61,79,110,.4);padding:3px 9px;border-radius:4px;">Total: ${total}</span>
-    <span style="font-size:9px;background:rgba(0,212,180,.12);color:var(--teal);border:1px solid rgba(0,212,180,.25);padding:3px 9px;border-radius:4px;">Closed: ${closed}</span>
-    <span style="font-size:9px;background:rgba(255,77,109,.1);color:var(--red);border:1px solid rgba(255,77,109,.2);padding:3px 9px;border-radius:4px;">Open: ${open}</span>
+    <span style="font-size:9px;background:rgba(0,212,180,.12);color:#2e7d5a;border:1px solid rgba(0,212,180,.25);padding:3px 9px;border-radius:4px;">Closed: ${closed}</span>
+    <span style="font-size:9px;background:rgba(176,48,48,.1);color:var(--red);border:1px solid rgba(176,48,48,.15);padding:3px 9px;border-radius:4px;">Open: ${open}</span>
     ${rnp>0?`<span style="font-size:9px;background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2);padding:3px 9px;border-radius:4px;">RNP: ${rnp}</span>`:""}`;
   // Update KPI cards in snag section
   const totalEl=document.getElementById("snag-total"); if(totalEl) totalEl.textContent=total||"—";
@@ -2497,7 +2519,7 @@ function applySnagFilters(){
             : filtered.map((s,i)=>{
                 const bg=i%2===0?"var(--s1)":"var(--s2)";
                 const sc =s.status==="Closed"?"var(--teal)":s.status==="RNP"?"var(--purple)":"var(--red)";
-                const sbg=s.status==="Closed"?"rgba(0,212,180,.12)":s.status==="RNP"?"rgba(167,139,250,.1)":"rgba(255,77,109,.1)";
+                const sbg=s.status==="Closed"?"rgba(0,212,180,.12)":s.status==="RNP"?"rgba(167,139,250,.1)":"rgba(176,48,48,.1)";
                 const pc =(s.priority||"").includes("P1")?"var(--red)":(s.priority||"").includes("P2")?"var(--amber)":"var(--muted)";
                 return `<tr style="background:${bg};">
                   <td style="padding:8px 12px;color:var(--muted);">${s.num}</td>
@@ -2531,8 +2553,8 @@ function updateSnagDonut(closed,open,rnp,total){
     el.setAttribute("stroke-dashoffset",-offset);
     el.setAttribute("stroke",color);
   };
-  setArc("snag-donut-closed", cArc, 0,    "#00d4b4");
-  setArc("snag-donut-open",   oArc, cArc, "#ff4d6d");
+  setArc("snag-donut-closed", cArc, 0,    "#2e7d5a");
+  setArc("snag-donut-open",   oArc, cArc, "#b03030");
   setArc("snag-donut-rnp",    rArc, cArc+oArc, "#a78bfa");
 
   const pct=Math.round(closed/total*100);
@@ -2632,7 +2654,7 @@ function renderManualSnagTable(c){
         </table>
       </div>
       <div style="padding:12px 16px;border-top:1px solid var(--border);">
-        <button onclick="addSnagRow()" style="background:rgba(0,212,180,.1);border:1px dashed rgba(0,212,180,.3);color:var(--teal);border-radius:7px;padding:8px 20px;font-size:10px;cursor:pointer;font-family:var(--font-m);width:100%;transition:all .15s;" onmouseover="this.style.background='rgba(0,212,180,.18)'" onmouseout="this.style.background='rgba(0,212,180,.1)'">+ Add Snag Item</button>
+        <button onclick="addSnagRow()" style="background:rgba(0,212,180,.1);border:1px dashed rgba(0,212,180,.3);color:#2e7d5a;border-radius:7px;padding:8px 20px;font-size:10px;cursor:pointer;font-family:var(--font-m);width:100%;transition:all .15s;" onmouseover="this.style.background='rgba(0,212,180,.18)'" onmouseout="this.style.background='rgba(0,212,180,.1)'">+ Add Snag Item</button>
       </div>
     </div>`;
   updateSnagSummary();
@@ -2674,18 +2696,18 @@ function renderBB(){
         </div>
       </div>
       <div class="acc-body">
-        <div class="sub-hdr" style="display:grid;grid-template-columns:1fr 120px 60px 70px 110px;gap:8px;padding:10px 18px 6px;">
-          <div>Checklist Item</div><div>Evidence Required</div><div>Critical</div><div>Priority</div><div>Status</div>
+        <div class="sub-hdr" style="display:grid;grid-template-columns:1fr 80px 90px 70px 110px;gap:8px;">
+          <div>Checklist Item</div><div>Owner</div><div>Planned</div><div>Priority</div><div>Status</div>
         </div>
         ${items.map((it,si)=>{
           const sc=it.status==="Closed"?"closed":it.status==="In Progress"?"inprog":"open";
           const priCol=it.priority==="High"?"var(--red)":it.priority==="Medium"?"var(--amber)":"var(--muted)";
-          return `<div class="sub-row" style="display:grid;grid-template-columns:1fr 120px 60px 70px 110px;gap:8px;padding:8px 18px;align-items:center;">
+          return `<div class="sub-row" style="display:grid;grid-template-columns:1fr 80px 90px 70px 110px;gap:8px;padding:9px 18px;align-items:start;">
             <div class="sub-scope">${it.item}</div>
-            <div class="sub-muted">${it.evidence||"—"}</div>
-            <div style="text-align:center"><span style="font-size:9px;color:${it.critical==="Y"?"var(--red)":"var(--muted)"}">${it.critical==="Y"?"🔴 Yes":"—"}</span></div>
+            <div style="font-size:9px;color:var(--muted);">${it.owner||"—"}</div>
+            <div style="font-size:9px;color:var(--muted);">${it.planned||"—"}</div>
             <div><span style="font-size:8px;color:${priCol};font-weight:600;">${it.priority||"—"}</span></div>
-            <div><span class="pill ${sc}" id="${id}-sub-${si}" onclick="cyclePill(this)">${pillLabel(it.status||"Open")}</span></div>
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;"><span class="pill ${sc}" id="${id}-sub-${si}" onclick="cyclePill(this)">${pillLabel(it.status||"Open")}</span>${overdueBadge(it.planned,it.status)}</div>
           </div>`;
         }).join("")}
       </div>`;
@@ -2725,15 +2747,17 @@ function renderHOTO(){
           </div>
         </div>
         <div class="acc-body">
-          <div class="sub-hdr" style="display:grid;grid-template-columns:1fr 80px 80px;gap:8px;padding:10px 18px 6px;">
-            <div>Checklist Item</div><div>Owner</div><div>Status</div>
+          <div class="sub-hdr" style="display:grid;grid-template-columns:1fr 80px 90px 90px 110px;gap:8px;">
+            <div>Checklist Item</div><div>Owner</div><div>Planned</div><div>Priority</div><div>Status</div>
           </div>
           ${items.map((it,si)=>{
             const sc=it.status==="Closed"?"closed":it.status==="In Progress"?"inprog":"open";
-            return `<div class="sub-row" style="display:grid;grid-template-columns:1fr 80px 80px;gap:8px;padding:7px 18px;align-items:center;">
+            return `<div class="sub-row" style="display:grid;grid-template-columns:1fr 80px 90px 90px 110px;gap:8px;padding:9px 18px;align-items:start;">
               <div class="sub-scope" style="font-size:10px;">${it.item}</div>
               <div style="font-size:9px;color:var(--muted);">${it.owner||"—"}</div>
-              <div><span class="pill ${sc}" onclick="cyclePill(this)">${pillLabel(it.status)}</span></div>
+              <div style="font-size:9px;color:var(--muted);">${it.planned||"—"}</div>
+              <div style="font-size:9px;color:var(--muted);">${it.priority||"—"}</div>
+              <div style="display:flex;align-items:center;gap:4px;"><span class="pill ${sc}" onclick="cyclePill(this)">${pillLabel(it.status)}</span>${overdueBadge(it.planned,it.status)}</div>
             </div>`;
           }).join("")}
         </div>`;
@@ -2749,8 +2773,14 @@ function renderHOTO(){
     }
     return;
   }
-  // ── Fallback: hardcoded checklist ──
-  const sections=[
+  // ── No data: prompt user to upload ──
+  const emptyDiv=document.createElement("div");
+  emptyDiv.style.cssText="padding:32px;text-align:center;color:var(--muted);font-size:11px;";
+  emptyDiv.innerHTML="Upload the master Excel to populate the Handover Checklist.";
+  c.appendChild(emptyDiv);
+  return;
+  // ── (legacy hardcoded fallback removed — all data from Excel) ──
+  const _sections=[
     {title:"General Handover", icon:"📋", items:[
       "All construction activities completed including restricted areas (as per Annexure D)",
       "Deep cleaning completed for the premises",
@@ -3007,7 +3037,7 @@ function overdueBadge(planned,status){
   const d=parseISODate(planned);
   const today=new Date(); today.setHours(0,0,0,0);
   const days=Math.round((today-d)/(1000*60*60*24));
-  return `<span style="font-size:7px;padding:1px 5px;border-radius:8px;background:rgba(255,77,109,.15);color:#ff4d6d;border:1px solid rgba(255,77,109,.3);margin-left:5px;white-space:nowrap;">⚠ ${days}d overdue</span>`;
+  return `<span style="font-size:7px;padding:1px 5px;border-radius:8px;background:rgba(176,48,48,.12);color:#b03030;border:1px solid rgba(176,48,48,.3);margin-left:5px;white-space:nowrap;">⚠ ${days}d overdue</span>`;
 }
 
 function renderInvoiceTracker(){
@@ -3043,8 +3073,8 @@ function renderInvoiceTracker(){
         <div style="font-family:var(--font-d);font-size:13px;font-weight:800;color:var(--text);">₹${(total/10000000).toFixed(2)} Cr</div>
       </div>
       <div style="background:rgba(0,212,180,.08);border-radius:8px;padding:10px;text-align:center;">
-        <div style="font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--teal);margin-bottom:4px;">Received</div>
-        <div style="font-family:var(--font-d);font-size:13px;font-weight:800;color:var(--teal);">₹${(received/10000000).toFixed(2)} Cr</div>
+        <div style="font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:#2e7d5a;margin-bottom:4px;">Received</div>
+        <div style="font-family:var(--font-d);font-size:13px;font-weight:800;color:#2e7d5a;">₹${(received/10000000).toFixed(2)} Cr</div>
       </div>
       <div style="background:rgba(240,165,0,.08);border-radius:8px;padding:10px;text-align:center;">
         <div style="font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-bottom:4px;">Pending</div>
@@ -3059,7 +3089,7 @@ function renderInvoiceTracker(){
     <!-- Table header -->
     <div style="display:grid;grid-template-columns:32px 50px 130px 1fr 120px 100px 130px;gap:0;padding:7px 14px;background:var(--s3);border-radius:6px 6px 0 0;">
       ${['#','%','Amount (INR)','Milestone','Invoice Status','Payment','Due Date'].map(h=>
-        `<div style="font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);">${h}</div>`
+        `<div style="font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;">${h}</div>`
       ).join('')}
     </div>
 
@@ -3081,7 +3111,7 @@ function renderInvoiceTracker(){
             <div style="font-size:8px;color:var(--muted);line-height:1.3;">${row.due}</div>
           </div>
           ${hasRemarks?`<div style="padding:0 14px 9px 14px;">
-            <div style="background:rgba(240,165,0,.08);border-left:2px solid var(--amber);padding:6px 10px;border-radius:0 4px 4px 0;font-size:8px;color:var(--muted);line-height:1.5;">
+            <div style="background:rgba(240,165,0,.1);border-left:3px solid var(--amber);padding:6px 10px;border-radius:0 4px 4px 0;font-size:8px;color:var(--text);line-height:1.5;">
               <span style="color:var(--amber);font-weight:700;">⚠ Notes: </span>${row.remarks}
             </div>
           </div>`:''}
@@ -3089,6 +3119,15 @@ function renderInvoiceTracker(){
     }).join('')}`;
 }
 
+
+// ── Date format helper — always DD-Mon-YYYY (e.g. 31-Mar-2026) ──────────────
+function formatDate(d){
+  if(!d) return "—";
+  const dt = d instanceof Date ? d : new Date(d);
+  if(isNaN(dt)) return String(d);
+  const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return `${String(dt.getDate()).padStart(2,"0")}-${months[dt.getMonth()]}-${dt.getFullYear()}`;
+}
 function renderRisks(){
   const c=document.getElementById("risk-grid");
   if(!c) return;
@@ -3341,7 +3380,7 @@ function renderHiring(){
       {label:'Onboarded',     val:onboarded,  col:'var(--teal)',   bg:'rgba(0,212,180,.08)',     border:'rgba(0,212,180,.25)'},
       {label:'Offered',       val:offered,    col:'var(--amber)',  bg:'rgba(240,165,0,.08)',      border:'rgba(240,165,0,.25)'},
       {label:'Shortlisted',   val:shortlisted,col:'var(--purple)', bg:'rgba(167,139,250,.08)',   border:'rgba(167,139,250,.25)'},
-      {label:'Open',          val:open,       col:'var(--red)',    bg:'rgba(255,77,109,.08)',     border:'rgba(255,77,109,.25)'},
+      {label:'Open',          val:open,       col:'var(--red)',    bg:'rgba(176,48,48,.06)',     border:'rgba(255,77,109,.25)'},
     ];
     strip.innerHTML = tiles.map(t=>`
       <div style="background:${t.bg};border:1px solid ${t.border};border-radius:8px;padding:12px;text-align:center;">
@@ -3390,7 +3429,7 @@ function renderHiring(){
         .sort()
         .map(iso=>new Date(iso));
 
-      const labels = uniqueDates.map(d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}));
+      const labels = uniqueDates.map(d=>formatDate(d));
 
       // For each unique date, count how many DOJs fall on that day
       const dayCounts = uniqueDates.map(ud=>{
@@ -3413,12 +3452,12 @@ function renderHiring(){
             {
               label:'Confirmed HC',
               data:cumulative,
-              borderColor:'#00d4b4',
-              backgroundColor:'rgba(0,212,180,.12)',
+              borderColor:'#2e7d5a',
+              backgroundColor:'rgba(46,125,90,.1)',
               borderWidth:2.5,
               pointRadius:6,
               pointHoverRadius:8,
-              pointBackgroundColor:'#00d4b4',
+              pointBackgroundColor:'#2e7d5a',
               pointBorderColor:'#0b0e14',
               pointBorderWidth:2,
               fill:true,
@@ -3427,7 +3466,7 @@ function renderHiring(){
             {
               label:`Target (${total} HC)`,
               data:Array(labels.length).fill(total),
-              borderColor:'rgba(255,77,109,.55)',
+              borderColor:'rgba(176,48,48,.55)',
               borderWidth:1.5,
               borderDash:[5,4],
               pointRadius:0,
@@ -3442,12 +3481,12 @@ function renderHiring(){
           plugins:{
             legend:{
               display:true,
-              labels:{color:'#6b7a99',font:{size:9},boxWidth:12,padding:12}
+              labels:{color:'#8a7e72',font:{size:9},boxWidth:12,padding:12}
             },
             tooltip:{
-              backgroundColor:'#1a2030',
-              titleColor:'#e8edf5',
-              bodyColor:'#6b7a99',
+              backgroundColor:'#fff8f2',
+              titleColor:'#2a1e14',
+              bodyColor:'#8a7e72',
               callbacks:{
                 label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y} HC`
               }
@@ -3455,13 +3494,13 @@ function renderHiring(){
           },
           scales:{
             x:{
-              ticks:{color:'#6b7a99',font:{size:8},maxRotation:30},
+              ticks:{color:'#8a7e72',font:{size:8},maxRotation:30},
               grid:{color:'rgba(35,43,58,.6)'}
             },
             y:{
               min:0,
               max:Math.max(total, cumulative[cumulative.length-1]||0)+5,
-              ticks:{color:'#6b7a99',font:{size:8},stepSize:10},
+              ticks:{color:'#8a7e72',font:{size:8},stepSize:10},
               grid:{color:'rgba(35,43,58,.6)'}
             }
           }
@@ -3483,7 +3522,7 @@ function renderHiring(){
     });
     const pesTotal = onb.length;
     const pesItems = [
-      {label:'Open / Not Started', val:pesCounts.Open,      col:'var(--red)',    bg:'rgba(255,77,109,.1)'},
+      {label:'Open / Not Started', val:pesCounts.Open,      col:'var(--red)',    bg:'rgba(176,48,48,.1)'},
       {label:'Initiated',          val:pesCounts.Initiated, col:'var(--amber)',  bg:'rgba(240,165,0,.1)'},
       {label:'Completed',          val:pesCounts.Closed,    col:'var(--teal)',   bg:'rgba(0,212,180,.1)'},
     ];
@@ -3562,7 +3601,7 @@ function renderHiring(){
           </div>
           <div style="text-align:center;font-family:var(--font-d);font-size:14px;font-weight:800;color:var(--text);">${r.hc}</div>
           <div style="text-align:center;">
-            <span style="font-family:var(--font-d);font-size:14px;font-weight:800;color:var(--teal);">${r.closed}</span>
+            <span style="font-family:var(--font-d);font-size:14px;font-weight:800;color:#2e7d5a;">${r.closed}</span>
             <div style="width:50px;height:3px;background:var(--s3);border-radius:2px;margin:3px auto 0;overflow:hidden;">
               <div style="width:${rPct}%;height:100%;background:var(--teal);border-radius:2px;"></div>
             </div>
@@ -3694,10 +3733,10 @@ function renderHiringMiniChart(){
       <div style="height:8px;border-radius:4px;overflow:hidden;display:flex;background:var(--s3);">
         <div style="width:${pC}%;background:var(--teal);transition:width .6s;" title="Onboarded: ${s.closed}"></div>
         <div style="width:${pW}%;background:var(--amber);transition:width .6s;" title="WIP: ${s.wip}"></div>
-        <div style="flex:1;background:rgba(255,77,109,.35);" title="Open: ${s.open}"></div>
+        <div style="flex:1;background:rgba(176,48,48,.3);" title="Open: ${s.open}"></div>
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:2px;">
-        <span style="font-size:7px;color:var(--teal);">✓${s.closed}</span>
+        <span style="font-size:7px;color:#2e7d5a;">✓${s.closed}</span>
         <span style="font-size:7px;color:var(--amber);">●${s.wip}</span>
         <span style="font-size:7px;color:var(--red);">○${s.open}</span>
       </div>`;
@@ -3715,7 +3754,7 @@ function updateOverdueBadge(sectionId, count){
   if(count>0){
     const badge=document.createElement('span');
     badge.className='overdue-hdr-badge';
-    badge.style.cssText='font-size:8px;padding:1px 7px;border-radius:10px;background:rgba(255,77,109,.15);color:#ff4d6d;border:1px solid rgba(255,77,109,.3);margin-left:8px;';
+    badge.style.cssText='font-size:8px;padding:1px 7px;border-radius:10px;background:rgba(176,48,48,.12);color:#b03030;border:1px solid rgba(176,48,48,.3);margin-left:8px;';
     badge.textContent=`⚠ ${count} overdue`;
     const chevron=hdr.querySelector('.sec-chevron');
     if(chevron) hdr.insertBefore(badge,chevron);
@@ -3776,14 +3815,14 @@ function renderOverduePanel(){
 
   // Update counts
   const allItems=getAllOverdueItems();
-  if(sub) sub.textContent=`${allItems.length} items overdue across all trackers · ${new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}`;
+  if(sub) sub.textContent=`${allItems.length} items overdue across all trackers · ${formatDate(new Date())}`;
   if(countEl) countEl.textContent=`${items.length} shown`;
   if(sbCount) sbCount.textContent=allItems.length||"";
 
   // Tracker accent colours
   const tCol={
-    "T&C":"#00d4b4","Handover Checklist":"#a78bfa","Base Build":"#f0a500",
-    "Other Activities":"#f0a500","Workstreams":"#00d4b4","Invoice":"#ff4d6d"
+    "T&C":"#2e7d5a","Handover Checklist":"#a78bfa","Base Build":"#f0a500",
+    "Other Activities":"#f0a500","Workstreams":"#2e7d5a","Invoice":"#b03030"
   };
 
   list.innerHTML = items.length===0
@@ -3831,6 +3870,16 @@ function filterOverdueOnly(section){
   if(firstBadge) firstBadge.scrollIntoView({behavior:"smooth", block:"center"});
 }
 
+function toggleSidebar(){
+  const sb   = document.querySelector('.sidebar');
+  const main = document.querySelector('.main');
+  const tab  = document.getElementById('sb-reopen-tab');
+  if(!sb) return;
+  const col = sb.classList.toggle('collapsed');
+  if(main) main.style.marginLeft = col ? '0' : '220px';
+  if(tab)  tab.style.display = col ? '' : 'none';
+}
+
 function toggleMobSidebar(){
   const sb  = document.querySelector('.sidebar');
   const ov  = document.getElementById('mob-overlay');
@@ -3864,19 +3913,103 @@ document.querySelectorAll('.sb-link').forEach(l=>{
   });
 });
 
+
+// ── Global "Open Items Only" filter ──────────────────────────────────────────
+let _globalOpenFilter = false;
+function toggleOpenFilter(){
+  _globalOpenFilter = !_globalOpenFilter;
+  const btn = document.getElementById('sb-open-filter');
+  const badge = document.getElementById('sb-open-badge');
+  if(btn){
+    btn.style.background = _globalOpenFilter ? 'rgba(176,48,48,.1)' : '';
+    btn.style.color = _globalOpenFilter ? '#b03030' : '';
+    btn.style.fontWeight = _globalOpenFilter ? '600' : '';
+  }
+  if(badge){
+    badge.style.display = _globalOpenFilter ? '' : 'none';
+    badge.textContent = 'ON';
+  }
+  // Apply to all sections
+  applyGlobalOpenFilter();
+}
+
+function applyGlobalOpenFilter(){
+  if(!_globalOpenFilter){
+    // Clear all sub-row overrides
+    document.querySelectorAll('.sub-row, .acc-item, .hire-role-row, .ct-row, .oa-row, .ws-sub-row')
+      .forEach(r=>r.style.display='');
+    return;
+  }
+  // TC — hide closed sub-rows
+  document.querySelectorAll('#tc-acc .sub-row').forEach(r=>{
+    const p=r.querySelector('.pill');
+    r.style.display=(!p||p.classList.contains('closed'))?'none':'';
+  });
+  // BB — hide closed sub-rows
+  document.querySelectorAll('#bb-acc .sub-row').forEach(r=>{
+    const p=r.querySelector('.pill');
+    r.style.display=(!p||p.classList.contains('closed'))?'none':'';
+  });
+  // HC — hide closed sub-rows
+  document.querySelectorAll('#hoto-checklist-acc .sub-row').forEach(r=>{
+    const p=r.querySelector('.pill');
+    r.style.display=(!p||p.classList.contains('closed'))?'none':'';
+  });
+  // Critical Tasks — hide closed rows
+  document.querySelectorAll('.ct-row').forEach(r=>{
+    const p=r.querySelector('.pill');
+    r.style.display=(!p||p.classList.contains('closed'))?'none':'';
+  });
+  // OA items
+  document.querySelectorAll('.oa-row, #oa-acc .acc-item').forEach(r=>{
+    const p=r.querySelector('.pill');
+    r.style.display=(!p||p.classList.contains('closed'))?'none':'';
+  });
+  // Hiring rows
+  document.querySelectorAll('.hire-role-row').forEach(r=>{
+    r.style.display=(r.dataset.status==='Closed')?'none':'';
+  });
+  // Show count summary
+  const count = document.querySelectorAll('.sub-row[style*="display: none"],.sub-row[style*="display:none"]').length;
+  const badge = document.getElementById('sb-open-badge');
+  if(badge) badge.textContent=`${document.querySelectorAll('.sub-row').length - count} open`;
+}
+
 function setupScrollSpy(){
-  const sections=["lease","kpis","hoto-tc","hoto-project","hoto-checklist","hoto-bb","other-activities","hiring","hoto-snag","ws-tracker","risks","questions","critical-tasks","upload-section"];
-  window.addEventListener("scroll",()=>{
-    let active="";
-    sections.forEach(id=>{
-      const el=document.getElementById(id);
-      if(el && el.getBoundingClientRect().top<=180) active=id;
+  const collapsibleIds = ["hoto-tc","hoto-project","hoto-checklist","hoto-bb","other-activities","hiring","hoto-snag","ws-tracker","risks","questions","critical-tasks"];
+  const allIds = ["lease","kpis",...collapsibleIds,"upload-section"];
+
+  window.addEventListener("scroll", ()=>{
+    // ── Sidebar active highlight ──────────────────────────────────────────
+    let active = "";
+    allIds.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el && el.getBoundingClientRect().top <= 160) active = id;
     });
     document.querySelectorAll(".sb-link").forEach(l=>{
-      const href=(l.getAttribute("href")||"").replace("#","");
-      l.classList.toggle("active", href===active);
+      const href = (l.getAttribute("href")||"").replace("#","");
+      l.classList.toggle("active", href === active);
     });
-  },{ passive:true });
+
+    // ── Auto-collapse: if we navigated to a section and scrolled away, collapse it ──
+    if(_navScrolling) return; // suppress during programmatic scroll
+    if(!_navOpenId) return;
+
+    const openEl = document.getElementById(_navOpenId);
+    if(!openEl) return;
+
+    const rect = openEl.getBoundingClientRect();
+    const vh   = window.innerHeight;
+
+    // "Scrolled away" = section is entirely above the viewport or below it
+    const aboveViewport = rect.bottom < 80;
+    const belowViewport = rect.top > vh;
+
+    if(aboveViewport || belowViewport){
+      openSection(_navOpenId, false);
+      _navOpenId = null;
+    }
+  }, { passive: true });
 }
 
 // ══════════════════════════════════════════════════
@@ -3925,7 +4058,7 @@ function processFile(file){
 
 function safeStr(v){
   if(v===undefined||v===null) return "";
-  if(v instanceof Date) return v.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+  if(v instanceof Date) return formatDate(v);
   return String(v).trim();
 }
 
@@ -4044,16 +4177,16 @@ function parseWorkbook(wb, filename){
           const isDone=floorName.toLowerCase().includes("done")||d<0;
           currentFloor={
             floor:floorName.replace(/ *- *Done/i,"").trim()+"F",
-            anj:anjRaw&&anjRaw!=="nan"?anjDate.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}):"—",
-            cw: cwRaw &&cwRaw!=="nan" ?cwDate.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}):"—",
+            anj:anjRaw&&anjRaw!=="nan"?formatDate(anjDate):"—",
+            cw: cwRaw &&cwRaw!=="nan" ?formatDate(cwDate):"—",
             cwDate:cwDate, done:isDone, scope:activity!=="nan"?activity:"",
-            items: activity!=="nan"&&activity!==""?[{desc:activity,status:status!=="nan"?status:"Open"}]:[]
+            items: activity!=="nan"&&activity!==""?[{desc:activity,status:(status&&status!=="nan")?status:"Open"}]:[]
           };
           newFloors.push(currentFloor);
         }
         // Sub-activity row (no Sr No, no floor name)
         else if((srNo==="nan"||srNo==="") && currentFloor && activity!=="nan" && activity!==""){
-          currentFloor.items.push({desc:activity, status:status!=="nan"?status:"Open", remarks:safeStr(r[9])!=="nan"?safeStr(r[9]):""});
+          currentFloor.items.push({desc:activity, status:(status&&status!=="nan")?status:"Open", remarks:safeStr(r[9])!=="nan"?safeStr(r[9]):""});
         }
       }
       if(newFloors.length>0){
@@ -4102,14 +4235,15 @@ function parseWorkbook(wb, filename){
         const cat     =safeStr(r[2]);
         const item    =safeStr(r[4]);
         const evidence=safeStr(r[5]);
-        const status  =safeStr(r[6]);
-        const owner   =safeStr(r[7]);
-        const priority=safeStr(r[11]);
+        const status  =(safeStr(r[6])&&safeStr(r[6])!=="nan")?safeStr(r[6]):"Open";
+        const owner   =(safeStr(r[7])&&safeStr(r[7])!=="nan")?safeStr(r[7]):"—";
+        const plannedBBraw=r[8] instanceof Date?formatDate(r[8]):safeStr(r[8])&&safeStr(r[8])!=="nan"?safeStr(r[8]):"";
+        const priority=(safeStr(r[11])&&safeStr(r[11])!=="nan")?safeStr(r[11]):"Medium";
         if(!item||item==="nan"||item==="Checklist Item") continue;
         const key=cat!=="nan"?cat:"Other";
         if(!newBB[key]) newBB[key]=[];
-        const plannedBB=r[8] instanceof Date?r[8].toISOString().slice(0,10):safeStr(r[8])!=="nan"?safeStr(r[8]):"";
-        newBB[key].push({item,evidence:evidence!=="nan"?evidence:"—",critical:"N",status:status!=="nan"?status:"Open",priority:priority!=="nan"?priority:"Medium",planned:plannedBB});
+        const plannedBB=r[8] instanceof Date?formatDate(r[8]):safeStr(r[8])&&safeStr(r[8])!=="nan"?safeStr(r[8]):"";
+        newBB[key].push({item,evidence:evidence!=="nan"?evidence:"—",critical:"N",status,priority,owner,planned:plannedBBraw});
       }
       if(Object.keys(newBB).length>0){
         // Update BB_DATA and re-render
@@ -4151,7 +4285,7 @@ function parseWorkbook(wb, filename){
         const sta=normSta(staRaw);
         const dojRaw=r[6];
         const doj=dojRaw instanceof Date
-          ? dojRaw.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})
+          ? formatDate(dojRaw)
           : (dojRaw&&dojRaw!==""&&dojRaw!=="NaT"?String(dojRaw).trim():"");
         nd.push({cat:lC,payroll:lP,pos:lPos,status:sta,statusRaw:staRaw,
           name:safeStr(r[5])!=="nan"?safeStr(r[5]):"",doj,
@@ -4217,13 +4351,13 @@ function parseWorkbook(wb, filename){
         const service=safeStr(r[1])!=="nan"?safeStr(r[1]):"General";
         const sub    =safeStr(r[2])!=="nan"?safeStr(r[2]):"";
         const act    =safeStr(r[3])!=="nan"?safeStr(r[3]):"";
-        const status =safeStr(r[4])!=="nan"?safeStr(r[4]):"Open";
+        const status =safeStr(r[4])&&safeStr(r[4])!=="nan"?safeStr(r[4]):"Open";
         const owner  =safeStr(r[5])!=="nan"?safeStr(r[5]):"";
         const remarks=safeStr(r[8])!=="nan"?safeStr(r[8]):"";
         const priority=safeStr(r[9])!=="nan"?safeStr(r[9]):"";
         if(!act&&!sub) continue;
         if(!newTC[service]) newTC[service]={items:[]};
-        const plannedTC=r[6] instanceof Date?r[6].toISOString().slice(0,10):safeStr(r[6])!=="nan"?safeStr(r[6]):"";
+        const plannedTC=r[6] instanceof Date?formatDate(r[6]):safeStr(r[6])&&safeStr(r[6])!=="nan"?safeStr(r[6]):"";
         newTC[service].items.push({sub,item:act,status,owner,remarks,priority,planned:plannedTC});
       }
       if(Object.keys(newTC).length>0){
@@ -4246,13 +4380,14 @@ function parseWorkbook(wb, filename){
         if(!srNo||srNo==="nan"||srNo==="Sr No") continue;
         const cat   =safeStr(r[1])!=="nan"?safeStr(r[1]):"General";
         const item  =safeStr(r[2])!=="nan"?safeStr(r[2]):"";
-        const status=safeStr(r[3])!=="nan"?safeStr(r[3]):"Open";
+        const status=safeStr(r[3])&&safeStr(r[3])!=="nan"?safeStr(r[3]):"Open";
         const owner =safeStr(r[5])!=="nan"?safeStr(r[5]):"";
         const remarks=safeStr(r[8])!=="nan"?safeStr(r[8]):"";
         if(!item) continue;
         if(!newHC[cat]) newHC[cat]=[];
-        const plannedHC=r[6] instanceof Date?r[6].toISOString().slice(0,10):safeStr(r[6])!=="nan"?safeStr(r[6]):"";
-        newHC[cat].push({item,status,owner,remarks,planned:plannedHC});
+        const plannedHC=r[6] instanceof Date?formatDate(r[6]):safeStr(r[6])&&safeStr(r[6])!=="nan"?safeStr(r[6]):"";
+        const priorityHC=safeStr(r[9])&&safeStr(r[9])!=="nan"?safeStr(r[9]):"—";
+        newHC[cat].push({item,status,owner,remarks,planned:plannedHC,priority:priorityHC});
       }
       if(Object.keys(newHC).length>0){
         // Store in a global so renderHOTO can use it
@@ -4300,7 +4435,7 @@ function parseWorkbook(wb, filename){
         if(!q||q==="nan"||q==="Question") continue;
         const team  =safeStr(r[1])!=="nan"?safeStr(r[1]):"General";
         const rem   =safeStr(r[2])!=="nan"?safeStr(r[2]):"";
-        const status=safeStr(r[3])!=="nan"?safeStr(r[3]):"Open";
+        const status=safeStr(r[3])&&safeStr(r[3])!=="nan"?safeStr(r[3]):"Open";
         if(!newQ[team]) newQ[team]=[];
         newQ[team].push({q,rem,status});
       }
@@ -4337,10 +4472,10 @@ function parseWorkbook(wb, filename){
         const cat   =safeStr(r[offCat])!=="nan"?safeStr(r[offCat]):"";
         const sub   =safeStr(r[offSub])!=="nan"?safeStr(r[offSub]):"";
         const desc  =safeStr(r[offDesc])!=="nan"?safeStr(r[offDesc]):"";
-        const status=safeStr(r[offStatus])!=="nan"?safeStr(r[offStatus]):"Open";
+        const status=safeStr(r[offStatus])&&safeStr(r[offStatus])!=="nan"?safeStr(r[offStatus]):"Open";
         const owner =safeStr(r[offOwner])!=="nan"?safeStr(r[offOwner]):"";
         const prio  =safeStr(r[offPrio])!=="nan"?safeStr(r[offPrio]):"High";
-        const plannedOA=r[offPlan] instanceof Date?r[offPlan].toISOString().slice(0,10):safeStr(r[offPlan])!=="nan"?safeStr(r[offPlan]):"";
+        const plannedOA=r[offPlan] instanceof Date?formatDate(r[offPlan]):safeStr(r[offPlan])&&safeStr(r[offPlan])!=="nan"?safeStr(r[offPlan]):"";
         if(!cat&&!desc) continue;
         newOA.push({cat,sub,desc,status,owner,priority:prio,planned:plannedOA});
       }
@@ -4364,12 +4499,12 @@ function parseWorkbook(wb, filename){
           const lead  =safeStr(r[7])!=="nan"?safeStr(r[7]):"";
           const team  =safeStr(r[8])!=="nan"?safeStr(r[8]):"";
           const status=safeStr(r[9])!=="nan"?safeStr(r[9]):"To be initiated";
-          const wsDate=r[3] instanceof Date?r[3].toISOString().slice(0,10):safeStr(r[3])!=="nan"?safeStr(r[3]):"";
+          const wsDate=r[3] instanceof Date?formatDate(r[3]):safeStr(r[3])&&safeStr(r[3])!=="nan"?safeStr(r[3]):"";
           cur={id:parseInt(wsId),name:wsName.trim(),pct,lead,team,planned:wsDate,status,subs:[]};
           newWS.push(cur);
         }
         if(cur&&scope&&scope!=="nan"){
-          const sd=r[3] instanceof Date?r[3].toISOString().slice(0,10):safeStr(r[3])!=="nan"?safeStr(r[3]):"";
+          const sd=r[3] instanceof Date?formatDate(r[3]):safeStr(r[3])&&safeStr(r[3])!=="nan"?safeStr(r[3]):"";
           cur.subs.push({
             scope:scope.trim(), date:sd,
             pct:parseFloat(safeStr(r[5]))||0, wtg:parseFloat(safeStr(r[4]))||0,
@@ -4386,19 +4521,22 @@ function parseWorkbook(wb, filename){
   if(wb.SheetNames.includes("Critical Tasks")){
     try{
       const rows=XLSX.utils.sheet_to_json(wb.Sheets["Critical Tasks"],{header:1,defval:""});
-      // Cols: 0=Task 1=Owner 2=Remarks 3=Status 4=Priority
+      // Actual cols: 0=SrNo 1=Category 2=Subcategory 3=Activity 4=Status 5=Owner 6=Planned 7=Actual 8=Remarks 9=Priority
       const newCT=[];
       for(let i=1;i<rows.length;i++){
         const r=rows[i];
-        const task=safeStr(r[0]);
-        if(!task||task==="nan"||task==="Task") continue;
-        newCT.push({
-          task,
-          owner:   safeStr(r[1])!=="nan"?safeStr(r[1]):"—",
-          remarks: safeStr(r[2])!=="nan"?safeStr(r[2]):"",
-          status:  safeStr(r[3])!=="nan"?safeStr(r[3]):"Open",
-          priority:safeStr(r[4])!=="nan"?safeStr(r[4]):"High",
-        });
+        const srNo=safeStr(r[0]);
+        if(!srNo||srNo==="nan"||srNo==="Sr No") continue;
+        const task    =safeStr(r[3])&&safeStr(r[3])!=="nan"?safeStr(r[3]):"";
+        const statusRaw=safeStr(r[4]);
+        const status  =statusRaw&&statusRaw!=="nan"?statusRaw:"Open";
+        const owner   =safeStr(r[5])&&safeStr(r[5])!=="nan"?safeStr(r[5]):"—";
+        const remarks =safeStr(r[8])&&safeStr(r[8])!=="nan"?safeStr(r[8]):"";
+        const priority=safeStr(r[9])&&safeStr(r[9])!=="nan"?safeStr(r[9]):"High";
+        const cat     =safeStr(r[1])&&safeStr(r[1])!=="nan"?safeStr(r[1]):"";
+        if(!task) continue;
+        const plannedCT=r[6] instanceof Date?formatDate(r[6]):safeStr(r[6])&&safeStr(r[6])!=="nan"?safeStr(r[6]):"—";
+        newCT.push({task, cat, owner, remarks, status, priority, planned:plannedCT});
       }
       if(newCT.length>0){ CRITICAL_TASKS.length=0; newCT.forEach(t=>CRITICAL_TASKS.push(t)); parsed++; }
     }catch(e){console.warn("Critical Tasks parse error:",e);}
@@ -4426,7 +4564,7 @@ function parseWorkbook(wb, filename){
 
   const name=filename.length>35?filename.substring(0,33)+"…":filename;
   setUploadStatus(`✓ <strong>${name}</strong> — ${parsed} sheets loaded · dashboard refreshed`,"live");
-  showToast(`Excel loaded — ${parsed} sheets updated`,"#00d4b4");
+  showToast(`Excel loaded — ${parsed} sheets updated`,"#2e7d5a");
 }
 
 // ══════════════════════════════════════════════════
@@ -4550,7 +4688,7 @@ function renderFloorTiles(){
     const highCount=fl.items.filter(i=>i.priority==="high"&&i.status!=="Closed").length;
     const openBadge=openCount>0
       ? `<span style="font-size:8px;padding:2px 7px;border-radius:10px;background:rgba(240,165,0,.12);color:var(--amber);border:1px solid rgba(240,165,0,.25);margin-left:6px;">${openCount} pending${highCount>0?` · ${highCount} 🔴`:''}</span>`
-      : `<span style="font-size:8px;padding:2px 7px;border-radius:10px;background:rgba(0,212,180,.1);color:var(--teal);border:1px solid rgba(0,212,180,.2);margin-left:6px;">✓ clear</span>`;
+      : `<span style="font-size:8px;padding:2px 7px;border-radius:10px;background:rgba(0,212,180,.1);color:#2e7d5a;border:1px solid rgba(0,212,180,.2);margin-left:6px;">✓ clear</span>`;
 
     const tile=document.createElement("div");
     tile.className="floor-tile";
@@ -4626,7 +4764,7 @@ function cycleFloorItem(el,floorIdx,itemIdx){
   el.textContent=isDone?"✓ Done":isWip?"● WIP":"○ Open";
   const row=el.closest(".floor-open-item");
   if(row){ row.classList.toggle("done",isDone); row.style.borderLeftColor=isDone?"var(--teal)":item.priority==="high"?"var(--red)":"var(--amber)"; }
-  showToast(`→ ${item.status}`,"#00d4b4");
+  showToast(`→ ${item.status}`,"#2e7d5a");
 }
 
 function toggleFloorExtra(){
@@ -4748,9 +4886,9 @@ function ragClass(status){
   return "rag-na";
 }
 function ragDot(status){
-  if(status==="Closed")      return "#00d4b4";
+  if(status==="Closed")      return "#2e7d5a";
   if(status==="In Progress") return "#f0a500";
-  if(status==="Open")        return "#ff4d6d";
+  if(status==="Open")        return "#b03030";
   return "var(--border)";
 }
 function getHiringRoleStats(roleName){
@@ -4796,9 +4934,9 @@ function showOrgDetail(role,hc,status,note){
   document.getElementById("org-detail-role").textContent=role;
   document.getElementById("org-detail-meta").textContent=hc?`Headcount: ${hc}`:"";
   document.getElementById("org-detail-note").textContent=note||"—";
-  const sc=status==="Closed"?{bg:"rgba(0,212,180,.15)",color:"#00d4b4",label:"✓ Closed"}:
+  const sc=status==="Closed"?{bg:"rgba(46,125,90,.15)",color:"#2e7d5a",label:"✓ Closed"}:
            status==="In Progress"?{bg:"rgba(240,165,0,.15)",color:"#f0a500",label:"● In Progress"}:
-           status==="Open"?{bg:"rgba(255,77,109,.15)",color:"#ff4d6d",label:"○ Not Started"}:
+           status==="Open"?{bg:"rgba(176,48,48,.12)",color:"#b03030",label:"○ Not Started"}:
            {bg:"var(--s2)",color:"var(--muted)",label:"— No data"};
   const statusEl=document.getElementById("org-detail-status");
   statusEl.style.cssText=`font-size:9px;padding:3px 10px;border-radius:12px;background:${sc.bg};color:${sc.color};border:1px solid ${sc.color}40;`;
@@ -4868,7 +5006,7 @@ function applyOrgRAG(){
     const open   = rows.filter(h=>h.status==='Open').length;
 
     // RAG rule: all closed → teal; any open → red; otherwise amber
-    const colour = closed===total ? '#00d4b4' : open>0 ? '#ff4d6d' : '#f0a500';
+    const colour = closed===total ? '#2e7d5a' : open>0 ? '#b03030' : '#f0a500';
     const tip    = `${closed}/${total} onboarded · ${wip} WIP · ${open} open`;
 
     dot.style.display    = 'block';
@@ -4895,8 +5033,8 @@ function applyOrgRAG(){
             ${h.doj?`<span style="color:var(--muted2);">· ${h.doj}</span>`:''}
           </span>`).join('')
         : '<span style="color:var(--muted2);font-size:8px;">No individual tracking data</span>';
-      const sc = closed===total?{bg:'rgba(0,212,180,.15)',color:'#00d4b4',label:'✓ Fully Onboarded'}
-               : open>0       ?{bg:'rgba(255,77,109,.15)',color:'#ff4d6d', label:'○ Positions Open'}
+      const sc = closed===total?{bg:'rgba(46,125,90,.15)',color:'#2e7d5a',label:'✓ Fully Onboarded'}
+               : open>0       ?{bg:'rgba(176,48,48,.12)',color:'#b03030', label:'○ Positions Open'}
                :                {bg:'rgba(240,165,0,.15)', color:'#f0a500', label:'● In Progress'};
       const statusEl=document.getElementById('org-detail-status');
       if(statusEl){ statusEl.style.cssText=`font-size:9px;padding:3px 10px;border-radius:12px;background:${sc.bg};color:${sc.color};border:1px solid ${sc.color}40;`; statusEl.textContent=sc.label; }
@@ -4904,9 +5042,9 @@ function applyOrgRAG(){
 
     // Also update the box border to reflect RAG (subtle)
     el.style.borderColor = closed===total
-      ? 'rgba(0,212,180,.5)'
+      ? 'rgba(46,125,90,.5)'
       : open>0
-        ? 'rgba(255,77,109,.4)'
+        ? 'rgba(176,48,48,.4)'
         : 'rgba(240,165,0,.4)';
   });
 }
@@ -4980,9 +5118,9 @@ function hBar(w="80%"){ return `<div style="height:2px;background:var(--border);
 function renderOrgCharts(){
 
   function box(id, label, sub, type){
-    const bg = type==='teal'  ? 'rgba(0,212,180,.15)'  :
+    const bg = type==='teal'  ? 'rgba(46,125,90,.15)'  :
                type==='amber' ? 'rgba(240,165,0,.15)'  : 'var(--s2)';
-    const bd = type==='teal'  ? 'rgba(0,212,180,.5)'   :
+    const bd = type==='teal'  ? 'rgba(46,125,90,.5)'   :
                type==='amber' ? 'rgba(240,165,0,.5)'   : 'var(--border2)';
     return `<div id="${id}" data-org-id="${id}" style="background:${bg};border:2px solid ${bd};border-radius:8px;
       padding:8px 12px;text-align:center;min-width:100px;max-width:140px;
@@ -5116,7 +5254,7 @@ function renderHiringKPIStrip(){
       <div style="font-size:7px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:3px;">Total HC</div>
     </div>
     <div style="background:rgba(0,212,180,.07);border-radius:8px;padding:8px 6px;border:1px solid rgba(0,212,180,.2);">
-      <div style="font-size:7px;text-transform:uppercase;color:var(--teal);margin-bottom:4px;text-align:center;">CW & Pierian</div>
+      <div style="font-size:7px;text-transform:uppercase;color:#2e7d5a;margin-bottom:4px;text-align:center;">CW & Pierian</div>
       <div style="font-family:var(--font-d);font-size:18px;font-weight:800;color:var(--text);text-align:center;">${cw.total}</div>
       <div style="font-size:7px;color:var(--muted);margin-top:3px;text-align:center;">${cw.closed} onboarded</div>
       <div style="margin-top:5px;padding-top:5px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
@@ -5133,7 +5271,7 @@ function renderHiringKPIStrip(){
         <span style="font-family:var(--font-d);font-size:12px;font-weight:800;color:${pesPendingIFM>0?"var(--amber)":"var(--teal)"};">${pesPendingIFM}</span>
       </div>
     </div>
-    <div style="background:rgba(255,77,109,.08);border-radius:8px;padding:8px 4px;text-align:center;border:1px solid rgba(255,77,109,.2);">
+    <div style="background:rgba(176,48,48,.06);border-radius:8px;padding:8px 4px;text-align:center;border:1px solid rgba(176,48,48,.15);">
       <div style="font-family:var(--font-d);font-size:22px;font-weight:800;color:var(--red);">${all.open}</div>
       <div style="font-size:7px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:3px;">Open HC</div>
     </div>`;
@@ -5205,7 +5343,7 @@ function processSnagFile(file){
           hideLoading();
           const n=file.name.length>25?file.name.substring(0,23)+"…":file.name;
           setSnagUploadStatus(`✓ <strong>${newSnags.length} snags</strong> loaded from ${n}`,"live");
-          showToast(`${newSnags.length} snags loaded`,"#00d4b4");
+          showToast(`${newSnags.length} snags loaded`,"#2e7d5a");
         }catch(err){ hideLoading(); setSnagUploadStatus("⚠ "+err.message,"err"); console.error(err); }
       },50);
     }catch(err){ hideLoading(); setSnagUploadStatus("⚠ Could not read file","err"); console.error(err); }
@@ -5222,14 +5360,52 @@ function setSnagUploadStatus(msg,state){
   if(tim) tim.textContent=state==="live"?new Date().toLocaleTimeString():"";
 }
 
+// Track which section was opened by click so scroll-spy knows not to fight it
+let _navOpenId = null;
+let _navScrolling = false;
+
 function navToSection(id){
-  const el=document.getElementById(id);
+  const el = document.getElementById(id);
   if(!el) return;
-  el.scrollIntoView({behavior:"smooth",block:"start"});
-  // Expand all top-level accordions in the target section after scroll
-  setTimeout(()=>{
-    el.querySelectorAll(".acc-item:not(.open)").forEach(a=>a.classList.add("open"));
-  },500);
+  const isCollapsible = el.classList.contains("sec-collapsible");
+
+  if(isCollapsible){
+    // If already open via a previous nav click — collapse + return to KPIs
+    if(_navOpenId === id && el.classList.contains("open")){
+      _navOpenId = null;
+      openSection(id, false);
+      setTimeout(()=>{
+        const kpiEl = document.getElementById("kpis");
+        if(kpiEl) kpiEl.scrollIntoView({behavior:"smooth", block:"start"});
+      }, 50);
+      return;
+    }
+    // Close whatever was previously open via nav
+    if(_navOpenId && _navOpenId !== id){
+      openSection(_navOpenId, false);
+    }
+    _navOpenId = id;
+    openSection(id, true);
+  }
+
+  // Scroll to section — suppress scroll-spy auto-collapse during scroll
+  _navScrolling = true;
+  setTimeout(()=>{ _navScrolling = false; }, 800);
+  setTimeout(()=> el.scrollIntoView({behavior:"smooth", block:"start"}), 30);
+}
+
+// Open or close a section explicitly, keeping chevron in sync
+function openSection(id, open){
+  const sec  = document.getElementById(id);
+  const chev = document.getElementById("chev-"+id);
+  if(!sec) return;
+  if(open){
+    sec.classList.add("open");
+    if(chev) chev.style.transform = "rotate(0deg)";
+  } else {
+    sec.classList.remove("open");
+    if(chev) chev.style.transform = "rotate(-90deg)";
+  }
 }
 
 // ══════════════════════════════════════════════════
@@ -5283,7 +5459,7 @@ function renderPhaseTiles(){
             <div style="width:${inprogPct}%;background:var(--amber);transition:width .6s;"></div>
           </div>
           <div style="display:flex;gap:0;justify-content:space-between;">
-            <div class="knt-stat"><div class="knt-stat-num" style="color:var(--teal)">${closedSubs}</div><div class="knt-stat-lbl">Closed</div></div>
+            <div class="knt-stat"><div class="knt-stat-num" style="color:#2e7d5a">${closedSubs}</div><div class="knt-stat-lbl">Closed</div></div>
             <div class="knt-stat"><div class="knt-stat-num" style="color:var(--amber)">${inprogSubs}</div><div class="knt-stat-lbl">In Prog</div></div>
             <div class="knt-stat"><div class="knt-stat-num" style="color:var(--muted2)">${openSubs}</div><div class="knt-stat-lbl">Open</div></div>
             <div class="knt-stat"><div class="knt-stat-num" style="color:${ph.color}">${pct}%</div><div class="knt-stat-lbl">Done</div></div>
@@ -5344,20 +5520,21 @@ function renderHOTOChecklistTile(){
       <div style="height:100%;width:${pct}%;background:${barCol};border-radius:3px;transition:width .6s;"></div>
     </div>
     <div style="display:flex;gap:12px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">
-      <span style="font-size:9px;color:var(--teal);">✓ ${done} done</span>
+      <span style="font-size:9px;color:#2e7d5a;">✓ ${done} done</span>
       <span style="font-size:9px;color:var(--amber);">● ${wip} in prog</span>
       <span style="font-size:9px;color:var(--muted2);">○ ${open} open</span>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;overflow-y:auto;max-height:200px;">
       ${cats.map(c=>{
         const cp=c.n>0?Math.round(c.done/c.n*100):0;
-        const cc=cp===100?"var(--teal)":cp>0?"var(--amber)":"var(--muted2)";
-        const ccH=cp>=100?"#00d4b4":cp>0?"#f0a500":"#ff4d6d";
+        const cwpH=c.n>0?Math.round(c.wip/c.n*100):0;
+        const ccH=cp===100?"#2e7d5a":c.wip>0?"#f0a500":"#b03030";
         return `<div style="display:grid;grid-template-columns:1fr 28px;gap:4px;align-items:center;margin-bottom:3px;">
           <div>
             <div style="font-size:7px;color:var(--muted);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.name}</div>
-            <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;">
-              <div style="height:100%;width:${cp===0?100:cp}%;background:${cp===0?"rgba(255,77,109,0.25)":ccH};border-radius:2px;transition:width .6s;"></div>
+            <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;display:flex;">
+              <div style="height:100%;width:${cp}%;background:#2e7d5a;flex-shrink:0;transition:width .6s;"></div>
+              <div style="height:100%;width:${cwpH}%;background:#f0a500;flex-shrink:0;transition:width .6s;"></div>
             </div>
           </div>
           <div style="font-size:8px;font-weight:700;color:${ccH};text-align:right;">${c.done}/${c.n}</div>
@@ -5377,7 +5554,7 @@ function renderSnagKPITile(){
         <div style="font-size:32px;opacity:.5;">📋</div>
         <div style="font-size:10px;color:var(--muted);text-align:center;">No snags logged yet</div>
         <div style="font-size:9px;color:var(--muted2);text-align:center;">Upload Excel or add manually<br>in the Snag Tracker section</div>
-        <div style="margin-top:6px;padding:5px 14px;background:rgba(0,212,180,.08);border:1px dashed rgba(0,212,180,.25);border-radius:6px;font-size:9px;color:var(--teal);">0 snags logged</div>
+        <div style="margin-top:6px;padding:5px 14px;background:rgba(0,212,180,.08);border:1px dashed rgba(0,212,180,.25);border-radius:6px;font-size:9px;color:#2e7d5a;">0 snags logged</div>
       </div>`;
     return;
   }
@@ -5406,9 +5583,9 @@ function renderSnagKPITile(){
       <div style="position:relative;width:72px;height:72px;flex-shrink:0;">
         <svg width="72" height="72" viewBox="0 0 72 72" style="transform:rotate(-90deg)">
           <circle cx="36" cy="36" r="29" fill="none" stroke="#1a2030" stroke-width="10"/>
-          <circle cx="36" cy="36" r="29" fill="none" stroke="#00d4b4" stroke-width="10"
+          <circle cx="36" cy="36" r="29" fill="none" stroke="#2e7d5a" stroke-width="10"
             stroke-dasharray="${closeArc} ${circ-closeArc}" stroke-dashoffset="0"/>
-          <circle cx="36" cy="36" r="29" fill="none" stroke="#ff4d6d" stroke-width="10"
+          <circle cx="36" cy="36" r="29" fill="none" stroke="#b03030" stroke-width="10"
             stroke-dasharray="${openArc} ${circ-openArc}" stroke-dashoffset="${-closeArc}"/>
           <circle cx="36" cy="36" r="29" fill="none" stroke="#a78bfa" stroke-width="10"
             stroke-dasharray="${rnpArc} ${circ-rnpArc}" stroke-dashoffset="${-(closeArc+openArc)}"/>
@@ -5425,7 +5602,7 @@ function renderSnagKPITile(){
           <span style="font-size:10px;color:var(--muted);">open snags</span>
         </div>
         <div style="display:flex;gap:10px;">
-          <span style="font-size:9px;color:var(--teal);">✓ ${closed} closed</span>
+          <span style="font-size:9px;color:#2e7d5a;">✓ ${closed} closed</span>
           <span style="font-size:9px;color:var(--purple);">— ${rnp} RNP</span>
           <span style="font-size:9px;color:var(--muted);">/ ${total} total</span>
         </div>
@@ -5436,7 +5613,7 @@ function renderSnagKPITile(){
       <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px;">By Priority</div>
       <div style="display:flex;flex-direction:column;gap:5px;">
         ${[
-          {label:"P1 – Critical", count:p1, col:"var(--red)",   bg:"rgba(255,77,109,.15)"},
+          {label:"P1 – Critical", count:p1, col:"var(--red)",   bg:"rgba(176,48,48,.12)"},
           {label:"P2 – High",     count:p2, col:"var(--amber)", bg:"rgba(240,165,0,.15)"},
           {label:"P3 – Medium",   count:p3, col:"var(--muted)", bg:"rgba(107,122,153,.15)"},
         ].map(({label,count,col,bg})=>{
@@ -5481,7 +5658,7 @@ function renderRiskRAGTile(){
   const sorted=[...red,...amber,...teal];
 
   const ragLabel={
-    red:  {icon:"🔴", label:"High",   col:"var(--red)",   bg:"rgba(255,77,109,.1)",  border:"rgba(255,77,109,.25)"},
+    red:  {icon:"🔴", label:"High",   col:"var(--red)",   bg:"rgba(176,48,48,.1)",  border:"rgba(255,77,109,.25)"},
     amber:{icon:"🟡", label:"Medium", col:"var(--amber)", bg:"rgba(240,165,0,.1)",   border:"rgba(240,165,0,.25)"},
     teal: {icon:"🟢", label:"Watch",  col:"var(--teal)",  bg:"rgba(0,212,180,.1)",   border:"rgba(0,212,180,.25)"},
   };
@@ -5492,7 +5669,7 @@ function renderRiskRAGTile(){
       ${["red","amber","teal"].map(c=>{
         const r=ragLabel[c];
         const count=RISKS.filter(x=>x.color===c).length;
-        return `<div style="background:${r.bg};border:1px solid ${r.border};border-radius:8px;padding:10px;text-align:center;cursor:pointer;" onclick="navToSection('risks')">
+        return `<div style="background:${r.bg};border:1px solid ${r.border};border-radius:8px;padding:10px;text-align:center;cursor:pointer;" onclick=\"navToSection('risks')\">
           <div style="font-size:20px;margin-bottom:2px;">${r.icon}</div>
           <div style="font-family:var(--font-d);font-size:22px;font-weight:800;color:${r.col};line-height:1;">${count}</div>
           <div style="font-size:8px;color:var(--muted);margin-top:3px;">${r.label} Risk</div>
@@ -5502,7 +5679,7 @@ function renderRiskRAGTile(){
     <!-- Risk list -->
     ${sorted.map(r=>{
       const rl=ragLabel[r.color];
-      return `<div class="rag-row" style="cursor:pointer;" onclick="navToSection('risks')">
+      return `<div class="rag-row" style="cursor:pointer;" onclick=\"navToSection('risks')\">
         <div class="rag-dot ${r.color}"></div>
         <div class="rag-content">
           <div class="rag-title">${r.title}</div>
@@ -5546,22 +5723,23 @@ function renderTCTile(){
       <div style="height:100%;width:${pct}%;background:${barCol};border-radius:3px;transition:width .6s;"></div>
     </div>
     <div style="display:flex;gap:12px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border);">
-      <span style="font-size:9px;color:var(--teal);">✓ ${done} done</span>
+      <span style="font-size:9px;color:#2e7d5a;">✓ ${done} done</span>
       <span style="font-size:9px;color:var(--amber);">● ${wip} in prog</span>
       <span style="font-size:9px;color:var(--muted2);">○ ${open} open</span>
     </div>
     <div style="display:flex;flex-direction:column;gap:5px;overflow-y:auto;max-height:200px;">
       ${cats.map(cat=>{
         const cp=cat.n>0?Math.round(cat.done/cat.n*100):0;
-        const cc=cp===100?"#00d4b4":cat.wip>0?"#f0a500":"#ff4d6d";
+        const wpct=cat.n>0?Math.round(cat.wip/cat.n*100):0;
         return `<div style="display:grid;grid-template-columns:1fr 36px;gap:6px;align-items:center;">
           <div>
             <div style="font-size:7px;color:var(--muted);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cat.name}</div>
-            <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;">
-              <div style="height:100%;width:${cp===0?100:cp}%;background:${cp===0?"rgba(255,77,109,0.25)":cc};border-radius:2px;transition:width .6s;"></div>
+            <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;display:flex;">
+              <div style="height:100%;width:${cp}%;background:#2e7d5a;border-radius:2px;transition:width .6s;flex-shrink:0;"></div>
+              <div style="height:100%;width:${wpct}%;background:#f0a500;transition:width .6s;flex-shrink:0;"></div>
             </div>
           </div>
-          <div style="font-size:8px;font-weight:700;color:${cc};text-align:right;">${cat.done}/${cat.n}</div>
+          <div style="font-size:8px;font-weight:700;color:${cp===100?"#2e7d5a":cat.wip>0?"#f0a500":"#b03030"};text-align:right;">${cat.done}/${cat.n}</div>
         </div>`;
       }).join("")}
     </div>`;
@@ -5598,23 +5776,24 @@ function renderBBTile(){
       <div style="height:100%;width:${pct}%;background:${barCol};border-radius:3px;transition:width .6s;"></div>
     </div>
     <div style="display:flex;gap:12px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">
-      <span style="font-size:9px;color:var(--teal);">✓ ${done} done</span>
+      <span style="font-size:9px;color:#2e7d5a;">✓ ${done} done</span>
       <span style="font-size:9px;color:var(--amber);">● ${wip} in prog</span>
       <span style="font-size:9px;color:var(--muted2);">○ ${open} open</span>
     </div>
     <div style="display:flex;flex-direction:column;gap:4px;overflow-y:auto;max-height:200px;">
       ${cats.map(c=>{
         const cp=c.n>0?Math.round(c.done/c.n*100):0;
-        const cc=cp===100?"var(--teal)":cp>0?"var(--amber)":"var(--muted2)";
-        const cc2=cp>=100?"#00d4b4":cp>0?"#f0a500":"#ff4d6d";
+        const cwp=c.n>0?Math.round(c.wip/c.n*100):0;
+        const cc2=cp===100?"#2e7d5a":c.wip>0?"#f0a500":"#b03030";
         return `<div style="display:grid;grid-template-columns:1fr auto 36px;gap:6px;align-items:center;">
           <div>
             <div style="font-size:7px;color:var(--muted);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.name}</div>
-            <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;">
-              <div style="height:100%;width:${cp===0?100:cp}%;background:${cp===0?"rgba(255,77,109,0.25)":cc2};border-radius:2px;transition:width .6s;"></div>
+            <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;display:flex;">
+              <div style="height:100%;width:${cp}%;background:#2e7d5a;flex-shrink:0;transition:width .6s;"></div>
+              <div style="height:100%;width:${cwp}%;background:#f0a500;flex-shrink:0;transition:width .6s;"></div>
             </div>
           </div>
-          ${c.critical>0?`<span style="font-size:7px;color:#ff4d6d;background:rgba(255,77,109,.1);padding:1px 4px;border-radius:3px;">⚠${c.critical}</span>`:"<span></span>"}
+          ${c.critical>0?`<span style="font-size:7px;color:#b03030;background:rgba(176,48,48,.1);padding:1px 4px;border-radius:3px;">⚠${c.critical}</span>`:"<span></span>"}
           <div style="font-size:8px;font-weight:700;color:${cc2};text-align:right;">${c.done}/${c.n}</div>
         </div>`;
       }).join("")}
@@ -6034,78 +6213,71 @@ let OA_FULL_DATA = {
 };
 
 function renderOtherActivitiesAccordion(){
-  // Clear existing
-  ['oa-jpmc-acc','oa-others-acc'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
-  ['JPMC Workstream Track','Others'].forEach(source=>{
-    const domId = source==='JPMC Workstream Track'?'oa-jpmc-acc':'oa-others-acc';
-    const countId = source==='JPMC Workstream Track'?'oa-jpmc-count':'oa-others-count';
-    const c=document.getElementById(domId);
-    if(!c) return;
-    c.innerHTML='';
+  const acc = document.getElementById('oa-main-acc');
+  if(!acc) return;
+  acc.innerHTML = '';
 
-    const data = OA_FULL_DATA[source]||[];
-    // Group by category
-    const cats={};
-    data.forEach((item,idx)=>{
-      if(!cats[item.cat]) cats[item.cat]=[];
-      cats[item.cat].push({...item, _idx:idx});
-    });
+  const data = OA_DATA;
+  if(!data.length){
+    acc.innerHTML='<div style="padding:32px;text-align:center;color:var(--muted);font-size:11px;">Upload the master Excel to populate Other Activities.</div>';
+    return;
+  }
 
-    const total=data.length;
-    const done=data.filter(x=>x.status==='Closed').length;
-    const countEl=document.getElementById(countId);
-    if(countEl) countEl.textContent=`${done}/${total} closed`;
+  const cats = {};
+  data.forEach((item,idx)=>{ if(!cats[item.cat]) cats[item.cat]=[]; cats[item.cat].push({...item,_idx:idx}); });
 
-    // Populate filter dropdowns
-    const catSel=document.getElementById('foa-cat');
-    if(catSel){ catSel.innerHTML='<option value="">All Categories</option>'; }
-    if(catSel){
-      [...new Set(data.map(x=>x.cat))].forEach(cat=>{
-        const o=document.createElement('option'); o.value=cat; o.textContent=cat; catSel.appendChild(o);
-      });
-    }
-    const subSel=document.getElementById('foa-sub');
-    if(subSel && subSel.options.length<=1){
-      [...new Set(data.map(x=>x.sub))].forEach(sub=>{
-        const o=document.createElement('option'); o.value=sub; o.textContent=sub; subSel.appendChild(o);
-      });
-    }
+  // Populate category filter
+  const catSel=document.getElementById('foa-cat');
+  if(catSel){
+    catSel.innerHTML='<option value="">All Categories</option>';
+    Object.keys(cats).forEach(cat=>{const o=document.createElement('option');o.value=cat;o.textContent=cat;catSel.appendChild(o);});
+  }
 
-    Object.entries(cats).forEach(([cat, items],ci)=>{
-      const id=`oa-${source.replace(/\s/g,'-')}-${ci}`;
-      const closed=items.filter(x=>x.status==='Closed').length;
-      const pct=Math.round(closed/items.length*100);
-      const div=document.createElement('div');
-      div.className='acc-item'; div.id=id;
-      div.innerHTML=`
-        <div class="acc-hdr" onclick="toggleAcc('${id}')">
-          <div class="acc-num" style="font-size:12px;width:auto;padding-right:8px;">📁</div>
-          <div class="acc-info">
-            <div class="acc-name">${cat}</div>
-            <div class="acc-meta">${items.length} items &nbsp;·&nbsp; ${closed} closed &nbsp;·&nbsp; ${pct}% done</div>
-          </div>
-          <div class="acc-right">
-            <div class="acc-bar-wrap" style="width:80px;"><div class="acc-bar-fill" style="width:${pct}%;background:${barColor(pct/100)};"></div></div>
-            <div class="acc-pct" style="color:${barColor(pct/100)}">${pct}%</div>
-            <div class="acc-chevron">▼</div>
-          </div>
+  Object.entries(cats).forEach(([cat,items],ci)=>{
+    const id=`oa-cat-${ci}`;
+    const closed=items.filter(x=>x.status==='Closed').length;
+    const wip=items.filter(x=>x.status==='In Progress').length;
+    const pct=items.length>0?Math.round(closed/items.length*100):0;
+    const div=document.createElement('div');
+    div.className='acc-item'; div.id=id;
+    div.innerHTML=`
+      <div class="acc-hdr" onclick="toggleAcc('${id}')">
+        <div class="acc-num" style="font-size:12px;width:auto;padding-right:8px;">📁</div>
+        <div class="acc-info">
+          <div class="acc-name">${cat}</div>
+          <div class="acc-meta">${items.length} items &nbsp;·&nbsp; ${closed} closed &nbsp;·&nbsp; ${wip} in progress</div>
         </div>
-        <div class="acc-body">
-          <div class="sub-hdr" style="display:grid;grid-template-columns:160px 1fr 80px;gap:8px;padding:8px 18px 6px;">
-            <div>Sub-category</div><div>Activity</div><div>Status</div>
-          </div>
-          ${items.map((item,ii)=>{
-            const sc=item.status==='Closed'?'closed':item.status==='In Progress'?'inprog':'open';
-            return `<div class="sub-row" style="display:grid;grid-template-columns:160px 1fr 80px;gap:8px;padding:8px 18px;align-items:start;">
-              <div class="sub-muted" style="padding-top:2px;">${item.sub}</div>
-              <div class="sub-scope">${item.desc}</div>
-              <div><span class="pill ${sc}" onclick="cycleOAPill(this,'${source}',${item._idx})">${pillLabel(item.status)}</span></div>
-            </div>`;
-          }).join('')}
-        </div>`;
-      c.appendChild(div);
-    });
+        <div class="acc-right">
+          <div class="acc-bar-wrap" style="width:80px;"><div class="acc-bar-fill" style="width:${pct}%;background:${barColor(pct/100)};"></div></div>
+          <div class="acc-pct" style="color:${barColor(pct/100)}">${pct}%</div>
+          <div class="acc-chevron">▼</div>
+        </div>
+      </div>
+      <div class="acc-body">
+        <div class="sub-hdr" style="display:grid;grid-template-columns:120px 1fr 70px 90px 70px 110px;gap:8px;">
+          <div>Sub-category</div><div>Activity</div><div>Owner</div><div>Planned</div><div>Priority</div><div>Status</div>
+        </div>
+        ${items.map((item)=>{
+          const sc=item.status==='Closed'?'closed':item.status==='In Progress'?'inprog':'open';
+          return `<div class="sub-row oa-row" style="display:grid;grid-template-columns:120px 1fr 70px 90px 70px 110px;gap:8px;padding:9px 18px;align-items:start;" data-status="${item.status}">
+            <div class="sub-muted">${item.sub||"—"}</div>
+            <div class="sub-scope">${item.desc}</div>
+            <div style="font-size:9px;color:var(--muted);">${item.owner||"—"}</div>
+            <div style="font-size:9px;color:var(--muted);">${item.planned||"—"}</div>
+            <div style="font-size:9px;color:var(--muted);">${item.priority||"—"}</div>
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;"><span class="pill ${sc}" onclick="cycleOADataPill(this,${item._idx})">${pillLabel(item.status)}</span>${overdueBadge(item.planned,item.status)}</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    acc.appendChild(div);
   });
+}
+
+function cycleOADataPill(el, idx){
+  OA_DATA[idx].status = nextStatus(OA_DATA[idx].status);
+  el.className=`pill ${pillClass(OA_DATA[idx].status)}`;
+  el.textContent=pillLabel(OA_DATA[idx].status);
+  renderOAKPITile();
 }
 
 function cycleOAPill(el, source, idx){
@@ -6125,7 +6297,7 @@ function cycleOAPill(el, source, idx){
   });
   if(oaIdx>=0) OTHER_ACTIVITIES[oaIdx].status=item.status;
   renderAllKPITiles();
-  showToast(`→ ${item.status}`,'#00d4b4');
+  showToast(`→ ${item.status}`,'#2e7d5a');
 }
 
 // Called on init and whenever statuses change
@@ -6159,12 +6331,14 @@ function renderOAKPITile(){
     const cDone = items.filter(a=>a.status==="Closed").length;
     const cWip  = items.filter(a=>a.status==="In Progress").length;
     const cPct  = Math.round(cDone/items.length*100);
-    const col   = cPct===100?"#00d4b4":cWip>0?"#f0a500":"#ff4d6d";
+    const cWipPct=items.length>0?Math.round(cWip/items.length*100):0;
+    const col   = cPct===100?"#2e7d5a":cWip>0?"#f0a500":"#b03030";
     return `<div style="display:grid;grid-template-columns:1fr 36px;gap:6px;align-items:center;margin-bottom:5px;">
       <div>
         <div style="font-size:8px;color:var(--muted);margin-bottom:2px;">${cat}</div>
-        <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;">
-          <div style="height:100%;width:${cPct===0?100:cPct}%;background:${cPct===0?"rgba(255,77,109,0.25)":col};border-radius:2px;transition:width .6s;"></div>
+        <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;display:flex;">
+          <div style="height:100%;width:${cPct}%;background:#2e7d5a;flex-shrink:0;transition:width .6s;"></div>
+          <div style="height:100%;width:${cWipPct}%;background:#f0a500;flex-shrink:0;transition:width .6s;"></div>
         </div>
       </div>
       <div style="font-size:8px;font-weight:700;color:${col};text-align:right;">${cDone}/${items.length}</div>
@@ -6172,24 +6346,22 @@ function renderOAKPITile(){
   }).join("");
 
   el.innerHTML=`
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;">
-      <div style="position:relative;width:52px;height:52px;flex-shrink:0;">
-        ${miniDonut(pct,'#f0a500')}
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-          <span style="font-family:var(--font-d);font-size:11px;font-weight:800;color:#f0a500;">${pct}%</span>
-        </div>
-      </div>
-      <div>
-        <div style="display:flex;gap:10px;margin-bottom:4px;">
-          <span style="font-size:9px;color:var(--teal);">✓ ${done}</span>
-          <span style="font-size:9px;color:var(--amber);">● ${wip}</span>
-          <span style="font-size:9px;color:var(--muted);">○ ${open}</span>
-          <span style="font-size:9px;color:var(--muted2);">/ ${total}</span>
-        </div>
-        <div style="font-size:8px;color:var(--muted2);">4 categories · All High priority</div>
-      </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+      <span style="font-size:9px;color:var(--muted);">${done} of ${total} items complete</span>
+      <span style="font-size:11px;font-weight:700;font-family:var(--font-d);color:${pct===100?"#2e7d5a":wip>0?"#f0a500":"#b03030"};">${pct}%</span>
     </div>
-    ${catRows}`;
+    <div style="height:6px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:8px;display:flex;">
+      <div style="height:100%;width:${pct}%;background:#2e7d5a;border-radius:3px;flex-shrink:0;transition:width .6s;"></div>
+      <div style="height:100%;width:${total>0?Math.round(wip/total*100):0}%;background:#f0a500;flex-shrink:0;transition:width .6s;"></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border);">
+      <span style="font-size:9px;color:#2e7d5a;">✓ ${done} done</span>
+      <span style="font-size:9px;color:#f0a500;">● ${wip} in prog</span>
+      <span style="font-size:9px;color:#b03030;">○ ${open} open</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;overflow-y:auto;max-height:200px;">
+    ${catRows}
+    </div>`;
 }
 
 // ── JPMC Workstreams KPI tile (full width, 24 workstreams) ────────────────────
@@ -6220,9 +6392,9 @@ function renderWSTracker(){
       <div style="font-size:8px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.08em;">Workstreams</div>
     </div>
     <div style="background:rgba(0,212,180,.08);border-radius:8px;padding:12px;text-align:center;border:1px solid rgba(0,212,180,.2);">
-      <div style="font-family:var(--font-d);font-size:24px;font-weight:800;color:var(--teal);">${doneWS}</div>
+      <div style="font-family:var(--font-d);font-size:24px;font-weight:800;color:#2e7d5a;">${doneWS}</div>
       <div style="font-size:8px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.08em;">Complete</div>
-      <div style="font-size:8px;color:var(--teal);margin-top:2px;">${subDone} sub-activities</div>
+      <div style="font-size:8px;color:#2e7d5a;margin-top:2px;">${subDone} sub-activities</div>
     </div>
     <div style="background:rgba(240,165,0,.08);border-radius:8px;padding:12px;text-align:center;border:1px solid rgba(240,165,0,.2);">
       <div style="font-family:var(--font-d);font-size:24px;font-weight:800;color:var(--amber);">${wipWS}</div>
@@ -6234,7 +6406,7 @@ function renderWSTracker(){
       <div style="font-size:8px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.08em;">Not Started</div>
       <div style="font-size:8px;color:var(--muted2);margin-top:2px;">${subTodo} sub-activities</div>
     </div>
-    <div style="background:rgba(255,77,109,.08);border-radius:8px;padding:12px;text-align:center;border:1px solid rgba(255,77,109,.2);">
+    <div style="background:rgba(176,48,48,.06);border-radius:8px;padding:12px;text-align:center;border:1px solid rgba(176,48,48,.15);">
       <div style="font-family:var(--font-d);font-size:24px;font-weight:800;color:var(--red);">${overdueWS}</div>
       <div style="font-size:8px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.08em;">Overdue Items</div>
     </div>`;
@@ -6275,7 +6447,7 @@ function renderWSTracker(){
         <div class="acc-info" style="flex:1;">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <div class="acc-name">${ws.name}</div>
-            ${overdueCount>0?`<span style="font-size:7px;padding:1px 5px;border-radius:8px;background:rgba(255,77,109,.15);color:#ff4d6d;border:1px solid rgba(255,77,109,.3);">⚠ ${overdueCount} overdue</span>`:""}
+            ${overdueCount>0?`<span style="font-size:7px;padding:1px 5px;border-radius:8px;background:rgba(176,48,48,.12);color:#b03030;border:1px solid rgba(176,48,48,.3);">⚠ ${overdueCount} overdue</span>`:""}
           </div>
           <div class="acc-meta">
             ${ws.lead?`<span style="margin-right:8px;">Lead: ${ws.lead}</span>`:""}
@@ -6299,7 +6471,7 @@ function renderWSTracker(){
       <div class="acc-body">
         ${ws.team?`<div style="padding:8px 18px 4px;font-size:8px;color:var(--muted2);">Team: ${ws.team}</div>`:""}
         <div style="display:grid;grid-template-columns:1fr 110px 60px 100px;gap:0;padding:7px 18px;background:var(--s3);">
-          ${["Activity","Target Date","Weight","Status"].map(h=>`<div style="font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);">${h}</div>`).join("")}
+          ${["Activity","Target Date","Weight","Status"].map(h=>`<div style="font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;">${h}</div>`).join("")}
         </div>
         ${ws.subs.map((sub,si)=>{
           const ss2=statusStyle(sub.status);
@@ -6308,7 +6480,7 @@ function renderWSTracker(){
           return `<div style="display:grid;grid-template-columns:1fr 110px 60px 100px;gap:0;padding:8px 18px;background:${bg};align-items:center;">
             <div>
               <span style="font-size:9px;color:var(--text);line-height:1.4;">${sub.scope}</span>
-              ${od?`<span style="font-size:7px;padding:1px 5px;border-radius:8px;background:rgba(255,77,109,.15);color:#ff4d6d;border:1px solid rgba(255,77,109,.3);margin-left:5px;">⚠ overdue</span>`:""}
+              ${od?`<span style="font-size:7px;padding:1px 5px;border-radius:8px;background:rgba(176,48,48,.12);color:#b03030;border:1px solid rgba(176,48,48,.3);margin-left:5px;">⚠ overdue</span>`:""}
               ${sub.remarks&&sub.remarks!=="nan"?`<div style="font-size:8px;color:var(--muted2);margin-top:2px;">${sub.remarks}</div>`:""}
             </div>
             <div style="font-size:8px;color:var(--muted);">${sub.date||"—"}</div>
@@ -6381,9 +6553,9 @@ function renderWSKPITile(){
       </div>
       <div></div>
       <div style="text-align:center;">
-        <div style="font-family:var(--font-d);font-size:22px;font-weight:800;color:var(--teal);">${subDone}</div>
+        <div style="font-family:var(--font-d);font-size:22px;font-weight:800;color:#2e7d5a;">${subDone}</div>
         <div style="font-size:7px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Completed</div>
-        <div style="font-size:7px;color:var(--teal);margin-top:1px;">${pct}%</div>
+        <div style="font-size:7px;color:#2e7d5a;margin-top:1px;">${pct}%</div>
       </div>
       <div></div>
       <div style="text-align:center;">
@@ -6491,17 +6663,19 @@ function renderProgressBanner(){
     const wsPct   = wsSubTotal>0 ? Math.round(wsSubDone/wsSubTotal*100) : 0;
 
     const metrics=[
-      {label:"T&C",              pct:tcPct,   col:"#00d4b4", total:tcTotal,    done:tcDone,    href:"#hoto-tc"},
-      {label:"Handover",         pct:hcPct,   col:"#a78bfa", total:hcTotal,    done:hcDone,    href:"#hoto-project"},
+      {label:"T&C",              pct:tcPct,   col:"#2e7d5a", total:tcTotal,    done:tcDone,    href:"#hoto-tc"},
+      {label:"Handover",         pct:hcPct,   col:"#7a4e9a", total:hcTotal,    done:hcDone,    href:"#hoto-project"},
       {label:"Base Build",       pct:bbPct,   col:"#f0a500", total:bbTotal,    done:bbDone,    href:"#hoto-bb"},
-      {label:"Snags",            pct:snagPct, col:"#ff4d6d", total:snagTotal,  done:snagDone,  href:"#hoto-snag"},
-      {label:"Hiring",           pct:hPct,    col:"#00d4b4", total:hTotal,     done:hDone,     href:"#hiring"},
+      {label:"Snags",            pct:snagPct, col:"#b03030", total:snagTotal,  done:snagDone,  href:"#hoto-snag"},
+      {label:"Hiring",           pct:hPct,    col:"#2e7d5a", total:hTotal,     done:hDone,     href:"#hiring"},
       {label:"Other Activities", pct:oaPct,   col:"#f0a500", total:oaTotal,    done:oaDone,    href:"#other-activities"},
-      {label:"Workstreams",      pct:wsPct,   col:"#a78bfa", total:wsSubTotal, done:wsSubDone, href:"#ws-tracker"},
+      {label:"Workstreams",      pct:wsPct,   col:"#7a4e9a", total:wsSubTotal, done:wsSubDone, href:"#ws-tracker"},
     ];
 
-    el.innerHTML = metrics.map(m=>`
-      <a href="${m.href}" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:10px;background:var(--s3);border:1px solid var(--border);transition:border-color .15s;cursor:pointer;"
+    el.innerHTML = metrics.map(m=>{
+      const secId = m.href.replace("#","");
+      return `
+      <a href="${m.href}" onclick="event.preventDefault();navToSection('${secId}');" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:10px;background:var(--s3);border:1px solid var(--border);transition:border-color .15s;cursor:pointer;"
         onmouseover="this.style.borderColor='${m.col}'" onmouseout="this.style.borderColor='var(--border)'">
         <div style="position:relative;width:52px;height:52px;">
           ${miniDonut(m.pct, m.col)}
@@ -6511,7 +6685,8 @@ function renderProgressBanner(){
         </div>
         <div style="font-size:9px;font-weight:700;color:var(--text);text-align:center;line-height:1.2;">${m.label}</div>
         <div style="font-size:8px;color:var(--muted);text-align:center;">${m.done}/${m.total}</div>
-      </a>`).join("");
+      </a>`;
+    }).join("");
   });
 }
 // ── Other Activities tile — hierarchical ────────────────────────────────────
@@ -6595,7 +6770,7 @@ function renderOtherActivitiesTile(){
       <div style="height:100%;width:${pct}%;background:${barC};border-radius:3px;"></div>
     </div>
     <div style="display:flex;gap:12px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">
-      <span style="font-size:8px;color:var(--teal);">✓ ${done} closed</span>
+      <span style="font-size:8px;color:#2e7d5a;">✓ ${done} closed</span>
       <span style="font-size:8px;color:var(--amber);">● ${wip} in progress</span>
       <span style="font-size:8px;color:var(--muted2);">○ ${open} open</span>
     </div>
@@ -6877,7 +7052,7 @@ function exportPDF(){
 
   // 5. Set metadata
   document.body.setAttribute('data-print-date',
-    new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}));
+    formatDate(new Date()));
   const orig = document.title;
   document.title = 'ODC_JPMC_Dashboard_' + new Date().toISOString().slice(0,10);
 
@@ -6902,12 +7077,13 @@ function exportPDF(){
 
 // ── SECTION COLLAPSE ──────────────────────────────────────────────────────────
 function toggleSection(id){
-  const sec  = document.getElementById(id);
-  const chev = document.getElementById('chev-'+id);
-  const body = document.getElementById('body-'+id);
+  const sec = document.getElementById(id);
   if(!sec) return;
-  const isOpen = sec.classList.toggle('open');
-  if(chev) chev.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(-90deg)';
+  const isOpen = sec.classList.contains("open");
+  openSection(id, !isOpen);
+  // If manually toggled, track it as the nav-open section
+  if(!isOpen) _navOpenId = id;
+  else if(_navOpenId === id) _navOpenId = null;
 }
 
 // ── FILTER STUBS ──────────────────────────────────────────────────────────────
@@ -6927,9 +7103,25 @@ function filterTC(){
     let show=true;
     if(sys && !title.toLowerCase().includes(sys.toLowerCase())) show=false;
     if(stat){
-      const pills=[...item.querySelectorAll('.pill')];
       const cls=stat==='Closed'?'closed':stat==='In Progress'?'inprog':'open';
-      if(!pills.some(p=>p.classList.contains(cls))) show=false;
+      // Filter sub-rows: show item if at least one sub-row pill matches
+      const subPills=[...item.querySelectorAll('.sub-row .pill, .acc-body .pill')];
+      if(subPills.length>0){
+        const matchingRows=subPills.filter(p=>p.classList.contains(cls));
+        // Hide non-matching sub-rows
+        item.querySelectorAll('.sub-row').forEach(row=>{
+          const rPill=row.querySelector('.pill');
+          row.style.display=(!rPill||rPill.classList.contains(cls))?'':'none';
+        });
+        if(matchingRows.length===0) show=false;
+      } else {
+        // Fall back to checking acc-item pills
+        const pills=[...item.querySelectorAll('.pill')];
+        if(!pills.some(p=>p.classList.contains(cls))) show=false;
+      }
+    } else {
+      // Show all sub-rows when no filter
+      item.querySelectorAll('.sub-row').forEach(r=>r.style.display='');
     }
     item.style.display=show?'':'none';
     show?shown++:hidden++;
@@ -6937,22 +7129,31 @@ function filterTC(){
   const el=document.getElementById('fcount-tc');
   if(el) el.textContent=hidden>0?`${shown} shown, ${hidden} hidden`:'';
 }
-function filterBB(){ 
+function filterBB(){
   const cat=document.getElementById('fbb-cat')?.value||'';
   const crit=document.getElementById('fbb-crit')?.value||'';
   const stat=document.getElementById('fbb-status')?.value||'';
   let shown=0,hidden=0;
   document.querySelectorAll('#bb-acc .acc-item').forEach(item=>{
     const title=item.querySelector('.acc-name')?.textContent||'';
-    const pills=item.querySelectorAll('.pill');
-    const hasCrit=item.innerHTML.includes('Go-Live Critical')||item.innerHTML.includes('critical:"Y"');
+    const hasCrit=item.querySelector('[data-critical="Y"]')||item.innerHTML.includes('⚠');
     let show=true;
     if(cat && !title.toLowerCase().includes(cat.toLowerCase())) show=false;
     if(crit==='Y' && !hasCrit) show=false;
     if(stat){
-      const cls = stat==='Closed'?'closed':stat==='In Progress'?'inprog':'open';
-      const allPills=[...pills];
-      if(!allPills.some(p=>p.classList.contains(cls))) show=false;
+      const cls=stat==='Closed'?'closed':stat==='In Progress'?'inprog':'open';
+      const subPills=[...item.querySelectorAll('.sub-row .pill,.acc-body .pill')];
+      if(subPills.length>0){
+        item.querySelectorAll('.sub-row').forEach(row=>{
+          const rPill=row.querySelector('.pill');
+          row.style.display=(!rPill||rPill.classList.contains(cls))?'':'none';
+        });
+        if(!subPills.some(p=>p.classList.contains(cls))) show=false;
+      } else {
+        if(!item.querySelectorAll('.pill').length) show=false;
+      }
+    } else {
+      item.querySelectorAll('.sub-row').forEach(r=>r.style.display='');
     }
     item.style.display=show?'':'none';
     show?shown++:hidden++;
@@ -6969,9 +7170,21 @@ function filterHC(){
     let show=true;
     if(cat && !title.toLowerCase().includes(cat.toLowerCase())) show=false;
     if(stat){
-      const pills=[...item.querySelectorAll('.pill')];
       const cls=stat==='Closed'?'closed':stat==='In Progress'?'inprog':'open';
-      if(!pills.some(p=>p.classList.contains(cls))) show=false;
+      // Show/hide individual sub-rows based on status
+      const subRows=[...item.querySelectorAll('.sub-row')];
+      if(subRows.length>0){
+        let anyMatch=false;
+        subRows.forEach(row=>{
+          const rPill=row.querySelector('.pill');
+          const match=rPill&&rPill.classList.contains(cls);
+          row.style.display=match?'':'none';
+          if(match) anyMatch=true;
+        });
+        if(!anyMatch) show=false;
+      }
+    } else {
+      item.querySelectorAll('.sub-row').forEach(r=>r.style.display='');
     }
     item.style.display=show?'':'none';
     show?shown++:hidden++;
@@ -7013,7 +7226,7 @@ function renderCriticalTasks(){
         <div style="font-family:var(--font-d);font-size:22px;font-weight:800;color:var(--text);">${total}</div>
         <div style="font-size:8px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.08em;">Total</div>
       </div>
-      <div style="background:rgba(255,77,109,.08);border-radius:8px;padding:10px;text-align:center;">
+      <div style="background:rgba(176,48,48,.06);border-radius:8px;padding:10px;text-align:center;">
         <div style="font-family:var(--font-d);font-size:22px;font-weight:800;color:var(--red);">${open}</div>
         <div style="font-size:8px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.08em;">Open</div>
       </div>
@@ -7022,7 +7235,7 @@ function renderCriticalTasks(){
         <div style="font-size:8px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.08em;">In Progress</div>
       </div>
       <div style="background:rgba(0,212,180,.08);border-radius:8px;padding:10px;text-align:center;">
-        <div style="font-family:var(--font-d);font-size:22px;font-weight:800;color:var(--teal);">${closed}</div>
+        <div style="font-family:var(--font-d);font-size:22px;font-weight:800;color:#2e7d5a;">${closed}</div>
         <div style="font-size:8px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.08em;">Closed</div>
       </div>
     </div>
@@ -7099,37 +7312,54 @@ function filterQuestions(){
   });
 }
 function filterOA(){
-  const cat=document.getElementById('foa-cat')?.value||'';
-  const sub=document.getElementById('foa-sub')?.value||'';
-  const stat=document.getElementById('foa-status')?.value||'';
-  ['oa-jpmc-acc','oa-others-acc'].forEach(cid=>{
-    const cont=document.getElementById(cid);
-    if(!cont) return;
+  const cat  = document.getElementById('foa-cat')?.value||'';
+  const stat = document.getElementById('foa-status')?.value||'';
+  let shown=0, hidden=0;
+
+  // Target both old containers (fallback) and new oa-main-acc
+  const containers = ['oa-main-acc','oa-jpmc-acc','oa-others-acc'].map(id=>document.getElementById(id)).filter(Boolean);
+  containers.forEach(cont=>{
     cont.querySelectorAll('.acc-item').forEach(item=>{
-      const name=item.querySelector('.acc-name')?.textContent||'';
-      const pills=[...item.querySelectorAll('.pill')];
-      let show=true;
+      const name = item.querySelector('.acc-name')?.textContent||'';
+      let show = true;
       if(cat && !name.toLowerCase().includes(cat.toLowerCase())) show=false;
       if(stat){
-        const cls=stat==='Closed'?'closed':stat==='In Progress'?'inprog':'open';
-        if(!pills.some(p=>p.classList.contains(cls))) show=false;
+        const cls = stat==='Closed'?'closed':stat==='In Progress'?'inprog':'open';
+        const subRows = [...item.querySelectorAll('.sub-row')];
+        if(subRows.length>0){
+          let anyMatch=false;
+          subRows.forEach(row=>{
+            const rPill = row.querySelector('.pill');
+            const match = rPill && rPill.classList.contains(cls);
+            row.style.display = match ? '' : 'none';
+            if(match) anyMatch=true;
+          });
+          if(!anyMatch) show=false;
+        }
+      } else {
+        item.querySelectorAll('.sub-row').forEach(r=>r.style.display='');
       }
-      item.style.display=show?'':'none';
+      item.style.display = show ? '' : 'none';
+      show ? shown++ : hidden++;
     });
   });
+
+  const el=document.getElementById('fcount-oa');
+  if(el) el.textContent=hidden>0?`${shown} shown, ${hidden} hidden`:'';
 }
 
 // ── THEME TOGGLE ──────────────────────────────────────────────────────────────
 function toggleTheme(){
-  const isLight=document.documentElement.classList.toggle("light");
-  document.getElementById("theme-icon").textContent=isLight?"🌙":"☀️";
-  document.getElementById("theme-label").textContent=isLight?"Dark Mode":"Light Mode";
-  try{ localStorage.setItem("odcTheme",isLight?"light":"dark"); }catch(e){}
+  const isDark=document.documentElement.classList.toggle("dark");
+  document.getElementById("theme-icon").textContent=isDark?"☀️":"🌙";
+  document.getElementById("theme-label").textContent=isDark?"Light Mode":"Dark Mode";
+  try{ localStorage.setItem("odcTheme",isDark?"dark":"light"); }catch(e){}
 }
-// Dark mode is always the default on fresh load — clear any cached theme
+// Light mode is the default — only switch to dark if saved
 (function(){
-  try{ localStorage.removeItem("odcTheme"); }catch(e){}
-  document.documentElement.classList.remove("light");
+  try{
+    if(localStorage.getItem("odcTheme")==="dark") document.documentElement.classList.add("dark");
+  }catch(e){}
 })();
 </script>
 
